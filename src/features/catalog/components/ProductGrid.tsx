@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { SearchX } from "lucide-react";
-import type { Product } from "@/types/product.types";
+import type { Product } from "@/features/catalog/types/product.types";
 import { buttonVariants } from "@/components/ui/button";
 import { ProductCard } from "./ProductCard";
 

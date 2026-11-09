@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { Search, SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { Category } from "@/types/category.types";
-import type { ProductQuery } from "@/types/product.types";
+import type { Category } from "@/features/catalog/types/category.types";
+import type { ProductQuery } from "@/features/catalog/types/product.types";
 
 export function ProductFilters({
   query,

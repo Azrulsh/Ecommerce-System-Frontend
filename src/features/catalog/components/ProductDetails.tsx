@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { ArrowLeft, Check, PackageX } from "lucide-react";
-import type { Product, ProductPrice as Price } from "@/types/product.types";
-import { productHref } from "@/lib/product-query";
+import type {
+  Product,
+  ProductPrice as Price,
+} from "@/features/catalog/types/product.types";
+import { productHref } from "@/features/catalog/product-query";
 import { ProductPlaceholder } from "./ProductPlaceholder";
 import { ProductPrice } from "./ProductPrice";
 import { ApiNotice } from "@/components/ui/api-notice";

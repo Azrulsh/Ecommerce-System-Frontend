@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
-import { ProductFilters } from "@/components/products/ProductFilters";
-import { ProductGrid } from "@/components/products/ProductGrid";
-import { Pagination } from "@/components/products/Pagination";
+import { ProductFilters } from "@/features/catalog/components/ProductFilters";
+import { ProductGrid } from "@/features/catalog/components/ProductGrid";
+import { Pagination } from "@/features/catalog/components/Pagination";
 import { ApiNotice } from "@/components/ui/api-notice";
-import { getCategories } from "@/lib/api/categories";
-import { getProducts } from "@/lib/api/products";
-import { parseProductQuery, productHref } from "@/lib/product-query";
+import { loadCatalog } from "@/features/catalog/server/queries";
+import {
+  parseProductQuery,
+  productHref,
+} from "@/features/catalog/product-query";
 
 export const metadata: Metadata = { title: "The collection" };
 
@@ -15,10 +17,7 @@ export default async function ProductsPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const query = parseProductQuery(await searchParams);
-  const [products, categories] = await Promise.allSettled([
-    getProducts(query),
-    getCategories(),
-  ]);
+  const { products, categories } = await loadCatalog(query);
   return (
     <div className="page-width py-10 sm:py-14">
       <div className="mb-9">

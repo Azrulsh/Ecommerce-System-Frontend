@@ -1,17 +1,13 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { ArrowDown, ArrowUpRight, Layers3, Sparkles } from "lucide-react";
-import { CategoryNavigation } from "@/components/products/CategoryNavigation";
-import { ProductGrid } from "@/components/products/ProductGrid";
+import { CategoryNavigation } from "@/features/catalog/components/CategoryNavigation";
+import { ProductGrid } from "@/features/catalog/components/ProductGrid";
 import { ApiNotice } from "@/components/ui/api-notice";
 import { buttonVariants } from "@/components/ui/button";
-import { getCategories } from "@/lib/api/categories";
-import { getProducts } from "@/lib/api/products";
+import { loadCatalog } from "@/features/catalog/server/queries";
 
 export default async function Home() {
-  const [products, categories] = await Promise.allSettled([
-    getProducts({ per_page: 4 }),
-    getCategories(),
-  ]);
+  const { products, categories } = await loadCatalog({ per_page: 4 });
   return (
     <>
       <section className="hero relative isolate overflow-hidden">

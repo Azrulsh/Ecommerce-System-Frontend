@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { ProductDetails } from "@/components/products/ProductDetails";
+import { ProductDetails } from "@/features/catalog/components/ProductDetails";
 import { ApiNotice } from "@/components/ui/api-notice";
-import { ApiError } from "@/lib/api/client";
-import { getProduct, getProductPrice } from "@/lib/api/products";
+import { loadProductDetails } from "@/features/catalog/server/queries";
 
 export const metadata: Metadata = { title: "Product details" };
 export default async function ProductPage({
@@ -14,13 +13,9 @@ export default async function ProductPage({
   const { id } = await params;
   if (!/^[1-9]\d{0,14}$/.test(id) || !Number.isSafeInteger(Number(id)))
     notFound();
-  const [product, price] = await Promise.allSettled([
-    getProduct(id),
-    getProductPrice(id),
-  ]);
-  if (product.status === "rejected") {
-    if (product.reason instanceof ApiError && product.reason.status === 404)
-      notFound();
+  const result = await loadProductDetails(id);
+  if (result.status === "not_found") notFound();
+  if (result.status !== "available") {
     return (
       <div className="page-width py-16">
         <ApiNotice
@@ -30,16 +25,5 @@ export default async function ProductPage({
       </div>
     );
   }
-  if (String(product.value.id) !== id)
-    return (
-      <div className="page-width py-16">
-        <ApiNotice href={`/products/${id}`} />
-      </div>
-    );
-  return (
-    <ProductDetails
-      product={product.value}
-      price={price.status === "fulfilled" ? price.value : null}
-    />
-  );
+  return <ProductDetails product={result.product} price={result.price} />;
 }

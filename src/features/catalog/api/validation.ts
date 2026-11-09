@@ -1,9 +1,9 @@
-import type { Category } from "../../types/category.types";
+import type { Category } from "../types/category.types";
 import type {
   Product,
   ProductPage,
   ProductPrice,
-} from "../../types/product.types";
+} from "../types/product.types";
 
 export class InvalidApiResponse extends Error {
   constructor() {
@@ -93,7 +93,16 @@ export function parseProducts(value: unknown): ProductPage {
   if (
     parsedMeta.per_page > 100 ||
     data.length > parsedMeta.per_page ||
-    (parsedMeta.from === null) !== (parsedMeta.to === null)
+    parsedMeta.last_page !==
+      Math.max(1, Math.ceil(parsedMeta.total / parsedMeta.per_page)) ||
+    (data.length === 0
+      ? parsedMeta.from !== null || parsedMeta.to !== null
+      : parsedMeta.from === null ||
+        parsedMeta.to === null ||
+        parsedMeta.from !==
+          (parsedMeta.current_page - 1) * parsedMeta.per_page + 1 ||
+        parsedMeta.to > parsedMeta.total ||
+        parsedMeta.to - parsedMeta.from + 1 !== data.length)
   )
     throw new InvalidApiResponse();
   return { data, meta: parsedMeta };

@@ -62,7 +62,7 @@ try {
       "--port",
       "3100",
     ],
-    { API_BASE_URL: "http://127.0.0.1:8101/api" },
+    { LARAVEL_API_URL: "http://127.0.0.1:8101/api" },
   );
   await ready("http://127.0.0.1:3100", app);
   const runner = launch([

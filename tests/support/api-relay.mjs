@@ -12,6 +12,8 @@ const modes = new Set([
   "categories-offline",
   "slow",
   "timeout",
+  "wrong-product",
+  "wrong-price",
 ]);
 
 createServer(async (request, response) => {
@@ -65,6 +67,18 @@ createServer(async (request, response) => {
       },
     );
     response.writeHead(result.status, { "Content-Type": "application/json" });
+    if (
+      result.ok &&
+      ((currentMode === "wrong-product" &&
+        /^\/api\/products\/\d+$/.test(url.pathname)) ||
+        (currentMode === "wrong-price" && url.pathname.endsWith("/price")))
+    ) {
+      const payload = await result.json();
+      if (currentMode === "wrong-product") payload.data.id += 1;
+      else payload.data.product_id += 1;
+      response.end(JSON.stringify(payload));
+      return;
+    }
     response.end(await result.text());
   } catch {
     response.writeHead(503).end();

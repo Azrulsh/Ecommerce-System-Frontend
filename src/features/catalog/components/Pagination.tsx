@@ -1,8 +1,11 @@
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
-import { productHref } from "@/lib/product-query";
-import type { ProductPage, ProductQuery } from "@/types/product.types";
+import { productHref } from "@/features/catalog/product-query";
+import type {
+  ProductPage,
+  ProductQuery,
+} from "@/features/catalog/types/product.types";
 
 export function Pagination({
   meta,

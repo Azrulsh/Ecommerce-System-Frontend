@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import type { Product } from "@/types/product.types";
+import type { Product } from "@/features/catalog/types/product.types";
 import { formatMoney } from "@/lib/format";
 import { ProductPlaceholder } from "./ProductPlaceholder";
 

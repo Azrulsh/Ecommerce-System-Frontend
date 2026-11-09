@@ -1,158 +1,102 @@
-﻿# Everyday storefront — integration proof of concept
+﻿# Everyday storefront
 
-A minimal, responsive Next.js storefront connected to the existing Laravel 12 REST API. This repository is independent of `ecommerce-system`. All catalog and pricing data comes from Laravel; the frontend does not connect to MySQL.
+A Next.js frontend for the independent Laravel e-commerce API. The working storefront currently supports browsing; Phase 1 establishes the architecture and security foundation for later customer and administrative features. It does not implement those features or claim production readiness.
 
 ## Stack
 
-- Next.js 16.4.5 App Router, React 19.3, strict TypeScript
-- Tailwind CSS 4, Lucide React icons
-- Locally owned, adapted shadcn/ui Button and Skeleton primitives with class-variance-authority, clsx and tailwind-merge; configuration in `components.json`
-- Server Components and native Fetch API; no global state manager
-- ESLint, Prettier and Playwright (development tools)
+Next.js 16.4.5 App Router, React 19.3, strict TypeScript, Tailwind CSS 4, locally owned adapted shadcn/ui primitives, Lucide React, native Fetch, ESLint, Prettier and Playwright. Existing versions and lockfile are retained. Read the installed Next.js guides in `node_modules/next/dist/docs/` before framework changes.
 
-The Next.js and React versions supplied by the existing project are retained. Follow the version-specific guides in `node_modules/next/dist/docs/` before changing framework code.
+## Setup
 
-## Prerequisites and setup
-
-- Node.js 20.9+ (verified with Node 24.22.2) and npm
-- The separately managed Laravel API running at `http://127.0.0.1:8000`, with its database already configured and catalog records available
-- Public GET access to the four endpoints below; no API credentials are needed
-
-Run installation commands **only in this frontend repository**:
+Requirements: Node.js 20.9+ (verified with 24.22.2), npm, and the separately managed Laravel API with an existing catalog. Run commands only in `ecommerce-frontend`:
 
 ```powershell
-cd C:\xampp\htdocs\ecommerce-frontend
 npm.cmd ci
 Copy-Item .env.example .env.local
 npm.cmd run dev
 ```
 
-Open the Local URL printed by Next.js (normally `http://localhost:3000`). On shells without the Windows PowerShell execution policy restriction, `npm` can be used instead of `npm.cmd`.
+Open the URL printed by Next.js, normally `http://localhost:3000`. Use `npm` on shells without Windows PowerShell's script execution restriction.
 
-Configure the server-only variable in `.env.local`:
+Configure `.env.local` or deployment environment:
 
 ```dotenv
-API_BASE_URL=http://127.0.0.1:8000/api
+LARAVEL_API_URL=http://127.0.0.1:8000/api
 ```
 
-Include `/api` in the URL. This is also the local development fallback if the variable is absent. Restart Next.js after changing environment configuration. In another environment, this URL must be reachable from the **Next.js server**, not merely from the browser. Use HTTPS for remote services. Do not put secrets in `NEXT_PUBLIC_` variables. Local environment files are ignored by Git; `.env.example` is the safe tracked template.
+Include the `/api` prefix. The URL must be reachable by the **Next.js server**. It is server-only and must not use a `NEXT_PUBLIC_` prefix. Restart Next.js after changing it.
 
-The frontend never starts, installs, migrates, seeds or modifies Laravel. Manage backend readiness separately according to its own documentation. Frontend tests send only public GET requests to Laravel and never alter its database.
+`API_BASE_URL` remains a deprecated fallback for existing PoC environments; `LARAVEL_API_URL` takes precedence. Development/test can default to the existing local URL. Production requires an explicit URL and HTTPS for remote services. Explicit loopback HTTP is supported for local production-build verification. Invalid configuration fails safely without exposing its value. The production build does not need API credentials or a running backend; runtime traffic does need valid configuration.
 
-## Pages and features
+Local environment files are ignored; `.env.example` is a safe tracked template. Do not put tokens, database credentials or other secrets into browser code. The frontend never connects to MySQL, starts Laravel, runs migrations/seeders or alters the backend. Keep both repositories independent.
 
-| Route | Behavior |
-| --- | --- |
-| `/` | Teal gradient hero, real category navigation and four products from the first catalog page |
-| `/products` | Product-name search, category slug filter, price/name sorting and Laravel pagination (12 per page) |
-| `/products/[id]` | Name, description, category, SKU, availability, original price, discount amount, final price and applied promotion |
+## Current behavior
 
-Shared components provide responsive navigation, footer, product cards, image placeholders, filters, pagination, pricing, skeletons, empty results, retry messages and a missing-product page. Controls have visible labels and focus indicators; mobile navigation supports Escape and returns focus to its toggle. Reduced-motion preferences are respected.
+| Route            | Function                                                                                               |
+| ---------------- | ------------------------------------------------------------------------------------------------------ |
+| `/`              | Existing teal hero, live category links and four products from the first catalog page                  |
+| `/products`      | Name search, category slug filter, base-price/name sorting, backend pagination at 12 products per page |
+| `/products/[id]` | Product information, category, SKU, stock, original/discount/final prices and applied promotion        |
 
-Catalog filters use a standard GET form and URL query parameters. Apply filters with the button or Enter in the search input. Changing filters resets the page; pagination retains the applied filters. This works without client-side JavaScript and supports browser history and shareable URLs.
+URL filters use a native GET form. Applying filters resets pagination; page links preserve filters. Shared components provide responsive navigation, focus indicators, Escape handling, loading skeletons, empty results, helpful retry states and missing-product handling. The visual direction and browsing functionality are preserved.
 
-## API integration
+Catalog cards show clearly labeled **base prices**. Detail prices and discounts come directly from Laravel. No discounts or totals are calculated in the frontend. MYR display follows the existing backend documentation; products do not supply a currency field. Product images are unavailable in the API and use honest placeholders. Homepage products use the first four name-sorted records because no featured flag exists.
 
-| Laravel endpoint | Frontend use |
-| --- | --- |
-| `GET /api/products` | Homepage and paginated catalog; `search`, `category`, `sort`, `page`, `per_page` |
-| `GET /api/categories` | Homepage category links and catalog filter options |
-| `GET /api/products/{id}` | Product details |
-| `GET /api/products/{id}/price` | Server-calculated public pricing and applied discount |
+Authentication, accounts, cart, wishlist, reviews, checkout, orders and admin UI remain unimplemented. Backend capability does not imply a frontend feature exists.
 
-Contracts were checked against the backend controllers, request validation, API Resources and live JSON responses. Categories and products arrive under `data`; catalog pagination arrives under `meta`. Monetary values are decimal strings. Public prices are displayed in MYR, consistent with the existing backend documentation and catalog; the catalog endpoint does not provide a currency field.
-
-- API modules are guarded with `server-only`; the browser receives rendered data, not integration credentials.
-- Every request uses `Accept: application/json`, explicit `no-store`, an eight-second timeout and disabled redirects. Network errors and invalid responses become safe messages without exposing internal exceptions.
-- `validation.ts` validates unknown response envelopes, fields, decimal amounts, categories and pagination before rendering. Search/category inputs are bounded scalar strings; sorting is allowlisted and query strings use `URLSearchParams`.
-- Homepage and catalog fetch their products and categories concurrently. Details fetch the product and price concurrently. There are no per-card price requests.
-- **Catalog cards show the base `price`, clearly labeled.** Sorting follows Laravel's base-price ordering. The detail page displays `original_price`, `discount_amount`, `final_price` and `applied_discount` directly from the pricing endpoint. No discounts or percentages are calculated in the frontend.
-- If current pricing is unavailable, product information remains visible with a retry message. A failed category request does not prevent product browsing.
-- Product cards disable speculative detail prefetching to avoid unnecessary product/pricing requests.
-- The API has no product image field. Explicit image-unavailable placeholders preserve layout; no product image URLs or product records are invented.
-
-## Structure and changed files
+## Architecture and API integration
 
 ```text
 src/
-  app/
-    page.tsx, layout.tsx, globals.css, icon.svg
-    error.tsx, loading.tsx, not-found.tsx
-    products/
-      page.tsx, loading.tsx
-      [id]/page.tsx, loading.tsx
-  components/
-    layout/Header.tsx, Footer.tsx
-    products/
-      CategoryNavigation.tsx, ProductCard.tsx, ProductGrid.tsx
-      ProductGridSkeleton.tsx, ProductPlaceholder.tsx
-      ProductFilters.tsx, Pagination.tsx
-      ProductDetails.tsx, ProductPrice.tsx
-    ui/button.tsx, skeleton.tsx, api-notice.tsx
-  lib/
-    api/client.ts, products.ts, categories.ts, validation.ts
-    product-query.ts, format.ts, utils.ts
-  types/product.types.ts, category.types.ts
+  app/                         # Routing and page composition
+  components/layout/           # Shared navigation and footer
+  components/ui/               # Shared presentation primitives
+  features/catalog/
+    components/                # Product/category presentation
+    types/                     # Catalog contract types
+    api/                       # Laravel adapters and runtime validation
+    server/queries.ts          # Data orchestration and partial-failure decisions
+    product-query.ts           # Safe URL query handling
+  lib/api/                     # Shared server client, configuration, errors and transport
+  lib/format.ts, utils.ts      # Shared display/CSS utilities
 ```
 
-Added configuration/support: `.env.example`, `components.json`, `.prettierignore`, `playwright.config.ts`, `tests/contracts.spec.ts`, `tests/storefront.spec.ts`, and the API relay, test runner and screenshot capture scripts in `tests/support/`. Updated existing files: `src/app/page.tsx`, `src/app/layout.tsx`, `src/app/globals.css`, `package.json`, `package-lock.json`, `.gitignore`, and this README. The starter `src/app/favicon.ico` is replaced by `icon.svg`. All other files in the structure above are newly added.
+Runtime data flows from route → feature server query → feature API adapter → guarded HTTP client → Laravel. Validated feature values flow back into presentation. Shared infrastructure has no catalog dependencies. New feature directories should be introduced only when that feature is implemented.
 
-## Development and verification
+The four existing integration endpoints remain `GET /api/products`, `/api/categories`, `/api/products/{id}` and `/api/products/{id}/price`. Independent reads run concurrently. There are no per-card price requests. Requests use explicit `no-store`, JSON acceptance, omitted credentials, an eight-second timeout and disabled redirects. Runtime validation checks JSON/media type, response fields, product identity and pagination consistency. Failures become safe typed errors; raw upstream diagnostics are never shown. No browser cookies or tokens are forwarded by the public client.
+
+The homepage explicitly stays request-rendered even when deployment configuration is unavailable during the build. Price failure keeps product information visible; category failure keeps search/sorting usable. Response headers add `nosniff`, frame denial, a referrer policy and restricted browser permissions. Personalized caching and mutation transport are not added speculatively.
+
+Phase 1 documents:
+
+- [Architecture assessment and conventions](docs/architecture.md)
+- [Verified backend contract inventory](docs/backend-contracts.md)
+- [Future Sanctum authentication strategy](docs/authentication-strategy.md)
+- [Changed-file manifest, validation, risks and roadmap](docs/phase-1-report.md)
+
+The backend currently uses **Sanctum bearer tokens, not SPA session-cookie login**. The recommended future integration is a same-origin Next.js BFF with an opaque HttpOnly frontend session and protected server-side token storage. That strategy is documented only; no auth routes or token storage were implemented.
+
+## Checks and development commands
 
 ```powershell
 npm.cmd run dev
 npm.cmd run lint
 npm.cmd run typecheck
 npm.cmd run format:check
+npm.cmd run test:unit
 npm.cmd run build
+npm.cmd test
 npm.cmd start
 ```
 
-For browser and contract tests, build first, leave Laravel running, then run:
+`test:unit` runs configuration/contract tests and local HTTP integration checks without Laravel, Edge or a production build. `npm.cmd test` runs both test projects using an already built frontend and an existing populated Laravel API. `npm.cmd run test:e2e` runs only storefront regressions. Focus a run with `npm.cmd test -- --grep "test name"`.
 
-```powershell
-npm.cmd run build
-npm.cmd test
-```
+Browser tests use installed Microsoft Edge (`channel: msedge`). Configure another supported browser if needed. Tests reserve ports 3100 and 8101, refuse to reuse existing servers, and stop only their own Node processes. Set `TEST_API_BASE_URL` to test another existing API. The test-only relay forwards GET requests to Laravel and injects faults only in its own responses; control writes never reach Laravel. It does not create fixtures, authenticate or mutate backend data.
 
-The default browser is the installed Microsoft Edge (`channel: msedge`). If Edge is unavailable, change the Playwright channel for your environment and install a supported browser. Tests reserve frontend port 3100 and test relay port 8101; they do not reuse or stop an existing development server. The test runner starts and stops only its own Node child processes. Use `npm.cmd test -- --grep "test name"` for a focused run.
+The suite covers real catalog results, filtering, sorting, pagination, stock, exact monetary values, unavailable/malformed responses, timeouts, partial failures, mismatched product identities, response headers, streamed loading HTML, keyboard access and overflow at 320/375/768/1440 pixels. Transient browser skeleton visibility is not reliably observable here; direct streaming is verified instead. With a dev server at `http://localhost:3000`, `node tests/support/capture.mjs` saves ignored desktop/mobile screenshots.
 
-With a development server already running at `http://localhost:3000`, `node tests/support/capture.mjs` saves desktop/mobile screenshots under the ignored `test-results/preview/` directory.
+## Security and remaining work
 
-The test-only relay normally forwards live GET responses to Laravel. Fault injection changes only the relay's in-memory state to simulate an unavailable service, malformed JSON, slow responses, timeouts, unavailable categories or unavailable pricing. This relay is never part of the app's normal integration and never forwards writes to Laravel. Set `TEST_API_BASE_URL` to target a different existing API during tests. Browser tests assume a nonempty existing catalog and do not seed fixtures.
+The dependency audit currently reports eight moderate development-tool findings through the ESLint/TypeScript lint chain and zero production-dependency vulnerabilities. The suggested automated fix downgrades `eslint-config-next`; no forced fix or upgrades were applied. Details and final check results are in the Phase 1 report.
 
-Tests compare actual rendered products, filtered/sorted/paginated lists and monetary values against live responses. They also cover stock availability, empty/missing products, recovery, partial failures, keyboard navigation and layout overflow at mobile, tablet and desktop widths. A direct streaming test confirms that skeleton HTML arrives before product content; transient skeleton visibility was not reliably observable in this browser environment. A few contract tests validate unsafe query inputs and malformed response data.
-
-Verification results from this implementation:
-
-| Check | Result |
-| --- | --- |
-| Development storefront | Existing Next.js server serves HTTP 200 at `http://localhost:3000`; its process was preserved |
-| Live Laravel connectivity | All four public GET endpoints verified against existing records |
-| Browser, streaming and contract suite | 12 passed in 2.3 minutes; no skipped tests |
-| Responsive layouts and keyboard navigation | Passed at 320, 375, 768 and 1440 pixels; desktop/mobile screenshots inspected |
-| ESLint | Passed |
-| Strict TypeScript and generated route types | Passed |
-| Prettier check | Passed |
-| Production build | Passed; storefront routes render dynamically on the server |
-| Production dependency audit | Zero vulnerabilities |
-| Complete dependency audit | Eight moderate development-tool findings; see limitations below |
-| Backend repository | Clean working tree; no backend or database changes performed |
-
-The initial browser assertion for transient skeleton visibility failed. Direct streaming verification then confirmed that skeleton HTML is delivered before the resolved product HTML; that deterministic check is included in the final passing suite. No browser security settings were changed. The test runner also avoids this Windows environment's hanging process-tree teardown by stopping only the Node children it started. No commits or pushes were made.
-
-## Limitations and next steps
-
-This is a browsing-only proof of concept, not a production-ready store. Authentication, accounts, cart, checkout, payments, order management and admin UI are intentionally outside its scope. There are no buttons implying these features exist.
-
-- Homepage products use the first four name-sorted records; the API has no featured-product flag.
-- No photography is available in the current product contract.
-- Currency is MYR; multi-currency display needs an explicit backend contract.
-- Only public, unauthenticated discounts apply; loyalty eligibility stays with Laravel.
-- No persistent catalog cache: freshness is preferred for the PoC. Requests are subject to backend rate limits.
-- Browser tests require a reachable, populated API. They compare current state, so concurrent catalog edits may affect a run.
-- Dependency audit reports eight moderate findings in the development-only ESLint/TypeScript lint chain through minimatch. The suggested automatic fix downgrades `eslint-config-next`; no forced dependency downgrade was applied. `npm audit --omit=dev` reports zero vulnerabilities.
-
-Future work could add backend-provided product media and featured flags, dedicated product metadata, richer accessibility audits, contract-driven caching and, in a separately authorized phase, customer authentication and transactional shopping features.
-
-Suggested commit message: `feat: add Laravel-integrated storefront proof of concept`
+Future phases must establish server sessions, CSRF/mutation protection, authorization, isolated authenticated tests, deployment TLS/HSTS/CSP, rate limiting and operational monitoring before release. The backend has no exposed refresh/password-reset/profile-update contracts, no admin capability in the user resource and no real gateway/shipping contract. Document these limits rather than inventing flows. See the roadmap for the recommended sequence. No backend modifications, commits, pushes, merges or releases were performed.

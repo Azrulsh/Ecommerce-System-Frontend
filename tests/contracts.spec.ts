@@ -2,13 +2,13 @@ import { expect, test } from "@playwright/test";
 import {
   parseProductQuery,
   productQueryString,
-} from "../src/lib/product-query";
+} from "../src/features/catalog/product-query";
 import {
   InvalidApiResponse,
   parseCategories,
   parseProductPrice,
   parseProducts,
-} from "../src/lib/api/validation";
+} from "../src/features/catalog/api/validation";
 
 test("query input is bounded, scalar, allowlisted and safely encoded", () => {
   const query = parseProductQuery({

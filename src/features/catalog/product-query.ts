@@ -2,7 +2,7 @@ import {
   productSorts,
   type ProductQuery,
   type ProductSort,
-} from "../types/product.types";
+} from "./types/product.types";
 type SearchParams = Record<string, string | string[] | undefined>;
 function queryText(value: SearchParams[string]): string {
   return typeof value === "string"

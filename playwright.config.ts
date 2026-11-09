@@ -6,6 +6,10 @@ export default defineConfig({
   workers: 1,
   timeout: 45_000,
   expect: { timeout: 15_000 },
+  projects: [
+    { name: "unit", testMatch: /(?:contracts|api-foundation)\.spec\.ts/ },
+    { name: "e2e", testMatch: /storefront\.spec\.ts/ },
+  ],
   use: {
     baseURL: "http://127.0.0.1:3100",
     channel: "msedge",

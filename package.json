@@ -9,7 +9,9 @@
     "lint": "eslint",
     "typecheck": "next typegen && tsc --noEmit",
     "test": "node tests/support/run-tests.mjs",
-    "format:check": "prettier --check src tests playwright.config.ts components.json"
+    "test:unit": "playwright test --project=unit",
+    "test:e2e": "node tests/support/run-tests.mjs --project=e2e",
+    "format:check": "prettier --check src tests docs README.md next.config.ts playwright.config.ts components.json package.json"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",

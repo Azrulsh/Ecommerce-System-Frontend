@@ -4,7 +4,7 @@ import {
   parseProduct,
   parseProductPrice,
   parseProducts,
-} from "../src/lib/api/validation";
+} from "../src/features/catalog/api/validation";
 import { formatMoney } from "../src/lib/format";
 
 const backend = process.env.TEST_API_BASE_URL ?? "http://127.0.0.1:8000/api";
@@ -35,7 +35,14 @@ test("homepage displays live products and category navigation", async ({
   const categories = parseCategories(
     await (await request.get(`${backend}/categories`)).json(),
   );
-  await page.goto("/");
+  const response = await page.goto("/");
+  expect(response?.headers()["x-content-type-options"]).toBe("nosniff");
+  expect(response?.headers()["x-frame-options"]).toBe("DENY");
+  expect(response?.headers()["referrer-policy"]).toBe(
+    "strict-origin-when-cross-origin",
+  );
+  expect(response?.headers()["permissions-policy"]).toContain("camera=()");
+  expect(response?.headers()["x-powered-by"]).toBeUndefined();
   await expect(page.getByRole("heading", { level: 1 })).toContainText(
     "Good finds.",
   );
@@ -239,6 +246,31 @@ test("partial pricing and category failures retain available data", async ({
     page.getByText("Category options are temporarily unavailable.", {
       exact: false,
     }),
+  ).toBeVisible();
+});
+
+test("product and price identity mismatches are rejected safely", async ({
+  page,
+  request,
+}) => {
+  const products = await liveProducts(request, "per_page=1");
+  test.skip(!products.data.length, "Needs an existing product.");
+  const product = products.data[0];
+  await setMode(request, "wrong-product");
+  await page.goto(`/products/${product.id}`);
+  await expect(
+    page.getByRole("heading", { name: "This product is taking a moment" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: product.name, exact: true }),
+  ).toHaveCount(0);
+  await setMode(request, "wrong-price");
+  await page.reload();
+  await expect(
+    page.getByRole("heading", { name: product.name, exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Current pricing is unavailable" }),
   ).toBeVisible();
 });
 

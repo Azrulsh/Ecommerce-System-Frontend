@@ -1,4 +1,4 @@
-import { ProductGridSkeleton } from "@/components/products/ProductGridSkeleton";
+import { ProductGridSkeleton } from "@/features/catalog/components/ProductGridSkeleton";
 import { Skeleton } from "@/components/ui/skeleton";
 export default function Loading() {
   return (

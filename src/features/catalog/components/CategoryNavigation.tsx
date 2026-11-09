@@ -7,8 +7,8 @@ import {
   Monitor,
   Shirt,
 } from "lucide-react";
-import type { Category } from "@/types/category.types";
-import { productHref } from "@/lib/product-query";
+import type { Category } from "@/features/catalog/types/category.types";
+import { productHref } from "@/features/catalog/product-query";
 
 export function CategoryNavigation({ categories }: { categories: Category[] }) {
   if (!categories.length)

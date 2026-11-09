@@ -1,5 +1,5 @@
 import { Tag } from "lucide-react";
-import type { ProductPrice as Price } from "@/types/product.types";
+import type { ProductPrice as Price } from "@/features/catalog/types/product.types";
 import { formatMoney } from "@/lib/format";
 
 export function ProductPrice({ price }: { price: Price }) {
