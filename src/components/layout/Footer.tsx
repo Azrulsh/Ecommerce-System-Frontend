@@ -22,7 +22,7 @@ export function Footer() {
             Explore the collection <ArrowUpRight size={14} aria-hidden="true" />
           </Link>
           <p className="text-xs text-slate-500">
-            A storefront preview · Browsing only
+            Good finds, saved for your everyday
           </p>
         </div>
       </div>

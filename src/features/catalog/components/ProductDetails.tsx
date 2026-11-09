@@ -8,6 +8,7 @@ import { productHref } from "@/features/catalog/product-query";
 import { ProductPlaceholder } from "./ProductPlaceholder";
 import { ProductPrice } from "./ProductPrice";
 import { ApiNotice } from "@/components/ui/api-notice";
+import { AddToCart } from "@/features/cart/components/AddToCart";
 
 export function ProductDetails({
   product,
@@ -69,6 +70,11 @@ export function ProductDetails({
             )}
           </div>
           <div className="mt-8 border-t border-slate-200 pt-6">
+            <AddToCart
+              productId={product.id}
+              stock={product.stock_quantity}
+              quantityControl
+            />
             <h2 className="text-sm font-semibold">The details</h2>
             <p className="mt-3 whitespace-pre-line break-words text-sm leading-7 text-slate-600">
               {product.description ??
@@ -76,8 +82,8 @@ export function ProductDetails({
             </p>
           </div>
           <p className="mt-8 text-xs leading-6 text-slate-500">
-            Explore at your own pace. Online ordering isn’t available in this
-            storefront preview.
+            Adding items does not reserve inventory. Checkout is planned for a
+            future phase.
           </p>
         </div>
       </div>

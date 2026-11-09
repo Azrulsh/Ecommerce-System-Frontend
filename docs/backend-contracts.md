@@ -37,6 +37,14 @@ Email is lowercased/trimmed. Registration requires a mixed-case, numeric passwor
 
 ## Cart
 
+Phase 2 verification: `POST /cart/items` **adds** to an existing product quantity;
+`PATCH /cart/items/{item}` sets an **absolute** quantity. Items identify products
+through nullable `product.id`, not a separate item `product_id` field. The backend
+limits carts to 100 distinct products and quantities to 1000. It has no cart bulk
+merge, cart idempotency key, revision or conditional-write endpoint. The
+[Phase 2 implementation](phase-2-auth-cart.md) handles these constraints without
+changing Laravel.
+
 | Endpoint                    | Contract                                                                                                                          |
 | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
 | `GET /cart`                 | Authenticated cart summary; CartService may create the customer's cart, so do not treat it as a side-effect-free assessment probe |

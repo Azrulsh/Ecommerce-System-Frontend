@@ -1,6 +1,12 @@
 import type { ApiConfig } from "./config";
 import { ApiError, httpError } from "./errors";
 
+export interface ApiRequestOptions {
+  method?: "GET" | "POST" | "PATCH" | "DELETE";
+  token?: string;
+  body?: unknown;
+}
+
 function requestUrl(baseUrl: string, path: string): URL {
   const base = new URL(`${baseUrl}/`);
   const url = new URL(path, base);
@@ -26,6 +32,7 @@ export async function requestJson<T>(
   path: string,
   parse: (value: unknown) => T,
   fetcher: typeof fetch = fetch,
+  options: ApiRequestOptions = {},
 ): Promise<T> {
   let url: URL;
   try {
@@ -34,11 +41,21 @@ export async function requestJson<T>(
     throw new ApiError("configuration");
   }
   const signal = AbortSignal.timeout(config.timeoutMs);
+  const headers: Record<string, string> = { Accept: "application/json" };
+  if (options.token) {
+    if (options.token.length > 4096 || /[\s\u0000-\u001f]/.test(options.token))
+      throw new ApiError("configuration");
+    headers.Authorization = `Bearer ${options.token}`;
+  }
+  if (options.body !== undefined) headers["Content-Type"] = "application/json";
   let response: Response;
   try {
     response = await fetcher(url, {
-      method: "GET",
-      headers: { Accept: "application/json" },
+      method: options.method ?? "GET",
+      headers,
+      ...(options.body !== undefined
+        ? { body: JSON.stringify(options.body) }
+        : {}),
       cache: "no-store",
       credentials: "omit",
       redirect: "error",
@@ -50,9 +67,48 @@ export async function requestJson<T>(
       (error instanceof Error && error.name === "TimeoutError");
     throw new ApiError(timedOut ? "timeout" : "network");
   }
-  if (!response.ok)
-    throw httpError(response.status, response.headers.get("retry-after"));
+  if (!response.ok) {
+    const error = httpError(
+      response.status,
+      response.headers.get("retry-after"),
+    );
+    let fields: string[] | undefined;
+    if (response.status === 422) {
+      try {
+        const data: unknown = await response.json();
+        if (
+          data &&
+          typeof data === "object" &&
+          "errors" in data &&
+          data.errors &&
+          typeof data.errors === "object" &&
+          !Array.isArray(data.errors)
+        )
+          fields = Object.keys(data.errors).filter((key) =>
+            [
+              "name",
+              "email",
+              "password",
+              "password_confirmation",
+              "quantity",
+              "product_id",
+            ].includes(key),
+          );
+      } catch {
+        if (signal.aborted) throw new ApiError("timeout", response.status);
+      }
+    } else {
+      await response.body?.cancel().catch(() => undefined);
+    }
+    throw new ApiError(
+      error.code,
+      error.status,
+      error.retryAfterSeconds,
+      fields,
+    );
+  }
   try {
+    if (response.status === 204) return parse(null);
     const mediaType = response.headers
       .get("content-type")
       ?.split(";")[0]

@@ -3,14 +3,15 @@ import { ArrowUpRight } from "lucide-react";
 import type { Product } from "@/features/catalog/types/product.types";
 import { formatMoney } from "@/lib/format";
 import { ProductPlaceholder } from "./ProductPlaceholder";
+import { AddToCart } from "@/features/cart/components/AddToCart";
 
 export function ProductCard({ product }: { product: Product }) {
   return (
-    <article className="group min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white transition-shadow hover:shadow-lg hover:shadow-teal-950/5">
+    <article className="group flex min-w-0 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white transition-shadow hover:shadow-lg hover:shadow-teal-950/5">
       <Link
         href={`/products/${product.id}`}
         prefetch={false}
-        className="block h-full"
+        className="block flex-1"
         aria-label={`View ${product.name}`}
       >
         <div className="relative">
@@ -44,6 +45,9 @@ export function ProductCard({ product }: { product: Product }) {
           </div>
         </div>
       </Link>
+      <div className="px-5 pb-5">
+        <AddToCart productId={product.id} stock={product.stock_quantity} />
+      </div>
     </article>
   );
 }

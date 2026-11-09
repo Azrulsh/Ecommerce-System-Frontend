@@ -1,5 +1,6 @@
 import "server-only";
 import { connection } from "next/server";
+import { serverIdentity } from "@/features/auth/server/session";
 import { ApiError } from "@/lib/api/errors";
 import { getCategories } from "../api/categories";
 import { getProduct, getProductPrice, getProducts } from "../api/products";
@@ -28,7 +29,9 @@ export async function loadProductDetails(
 ): Promise<ProductDetailsResult> {
   const [product, price] = await Promise.allSettled([
     getProduct(id),
-    getProductPrice(id),
+    serverIdentity()
+      .catch(() => null)
+      .then((identity) => getProductPrice(id, identity?.token)),
   ]);
   if (product.status === "rejected") {
     return {

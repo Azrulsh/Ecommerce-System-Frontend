@@ -1,14 +1,12 @@
-﻿# Everyday storefront
+# Everyday storefront
 
-A Next.js frontend for the independent Laravel e-commerce API. The working storefront currently supports browsing; Phase 1 establishes the architecture and security foundation for later customer and administrative features. It does not implement those features or claim production readiness.
+A Next.js storefront for the independent Laravel e-commerce API. Phase 2 adds customer authentication, persistent guest shopping, account carts and reviewed guest imports while preserving the existing teal storefront. Checkout, payments, orders, wishlist, review submission and admin UI remain future work.
 
-## Stack
+## Stack and setup
 
-Next.js 16.4.5 App Router, React 19.3, strict TypeScript, Tailwind CSS 4, locally owned adapted shadcn/ui primitives, Lucide React, native Fetch, ESLint, Prettier and Playwright. Existing versions and lockfile are retained. Read the installed Next.js guides in `node_modules/next/dist/docs/` before framework changes.
+Next.js 16.4.5 App Router, React 19.3, strict TypeScript, Tailwind CSS 4, locally owned shadcn/ui primitives, Lucide React, native Fetch and Playwright. No dependencies were added for Phase 2. Consult the installed Next.js documentation before framework changes.
 
-## Setup
-
-Requirements: Node.js 20.9+ (verified with 24.22.2), npm, and the separately managed Laravel API with an existing catalog. Run commands only in `ecommerce-frontend`:
+Requirements: Node.js 20.9+ (verified with 24.22.2), npm and the separately managed Laravel API. Run commands only in `ecommerce-frontend`:
 
 ```powershell
 npm.cmd ci
@@ -16,87 +14,86 @@ Copy-Item .env.example .env.local
 npm.cmd run dev
 ```
 
-Open the URL printed by Next.js, normally `http://localhost:3000`. Use `npm` on shells without Windows PowerShell's script execution restriction.
-
-Configure `.env.local` or deployment environment:
+Use `npm` in shells without PowerShell's script restriction. Configure the exact browser origin and the server-reachable API URL, including `/api`:
 
 ```dotenv
 LARAVEL_API_URL=http://127.0.0.1:8000/api
+APP_ORIGIN=http://localhost:3000
 ```
 
-Include the `/api` prefix. The URL must be reachable by the **Next.js server**. It is server-only and must not use a `NEXT_PUBLIC_` prefix. Restart Next.js after changing it.
+Open that exact origin; `localhost` and `127.0.0.1` are different origins. Restart Next.js after environment changes. Development creates a random persistent encryption key and encrypted sessions in a private per-project directory under the user's temporary directory, outside this XAMPP web root. Temporary-directory cleanup ends development sessions and loses import recovery records. Never use this default for production.
 
-`API_BASE_URL` remains a deprecated fallback for existing PoC environments; `LARAVEL_API_URL` takes precedence. Development/test can default to the existing local URL. Production requires an explicit URL and HTTPS for remote services. Explicit loopback HTTP is supported for local production-build verification. Invalid configuration fails safely without exposing its value. The production build does not need API credentials or a running backend; runtime traffic does need valid configuration.
+`LARAVEL_API_URL` is server-only. `API_BASE_URL` remains a deprecated fallback. Never use `NEXT_PUBLIC_` for credentials, session keys or the Laravel bearer token. Keep local environment files untracked. The frontend does not connect directly to MySQL or manage Laravel migrations or seeders.
 
-Local environment files are ignored; `.env.example` is a safe tracked template. Do not put tokens, database credentials or other secrets into browser code. The frontend never connects to MySQL, starts Laravel, runs migrations/seeders or alters the backend. Keep both repositories independent.
+## Implemented behavior
 
-## Current behavior
+| Route                 | Behavior                                                                                         |
+| --------------------- | ------------------------------------------------------------------------------------------------ |
+| `/`, `/products`      | Catalog, category navigation, search, sorting, pagination and add-to-cart                        |
+| `/products/[id]`      | Product, stock and Laravel pricing; eligible account pricing when identity verification succeeds |
+| `/login`, `/register` | Validated customer credentials, session rotation and safe internal return destinations           |
+| `/account`            | Server-verified public customer identity and sign-out                                            |
+| `/cart`               | Guest quantities and estimates, account cart, explicit guest import review and recovery          |
 
-| Route            | Function                                                                                               |
-| ---------------- | ------------------------------------------------------------------------------------------------------ |
-| `/`              | Existing teal hero, live category links and four products from the first catalog page                  |
-| `/products`      | Name search, category slug filter, base-price/name sorting, backend pagination at 12 products per page |
-| `/products/[id]` | Product information, category, SKU, stock, original/discount/final prices and applied promotion        |
+Guests can add, update and remove products without login. Storage contains only product IDs, quantities and an optional frozen import ID/snapshot. Account carts, prices, discounts and stock remain owned by Laravel. Guest totals are explicitly estimates from current public API prices; no discounts are calculated in Next.js. Adding products does not reserve inventory.
 
-URL filters use a native GET form. Applying filters resets pagination; page links preserve filters. Shared components provide responsive navigation, focus indicators, Escape handling, loading skeletons, empty results, helpful retry states and missing-product handling. The visual direction and browsing functionality are preserved.
+Login/register preserves guest items and offers import review with the destination account shown. Matching quantities are added, unique account items are retained, and only confirmed transfers are removed from guest storage. Failed or ambiguous transfers remain recoverable. Logout invalidates the browser session, attempts API token revocation and clears browser cart state; it never deletes or copies the account cart. Clearing unimported guest items requires explicit confirmation.
 
-Catalog cards show clearly labeled **base prices**. Detail prices and discounts come directly from Laravel. No discounts or totals are calculated in the frontend. MYR display follows the existing backend documentation; products do not supply a currency field. Product images are unavailable in the API and use honest placeholders. Homepage products use the first four name-sorted records because no featured flag exists.
+Proceeding to checkout hands guests to login/register, then reviewed import and the authenticated cart with a future-phase notice. No checkout or payment request is sent.
 
-Authentication, accounts, cart, wishlist, reviews, checkout, orders and admin UI remain unimplemented. Backend capability does not imply a frontend feature exists.
-
-## Architecture and API integration
+## Architecture and security
 
 ```text
-src/
-  app/                         # Routing and page composition
-  components/layout/           # Shared navigation and footer
-  components/ui/               # Shared presentation primitives
-  features/catalog/
-    components/                # Product/category presentation
-    types/                     # Catalog contract types
-    api/                       # Laravel adapters and runtime validation
-    server/queries.ts          # Data orchestration and partial-failure decisions
-    product-query.ts           # Safe URL query handling
-  lib/api/                     # Shared server client, configuration, errors and transport
-  lib/format.ts, utils.ts      # Shared display/CSS utilities
+src/app/                  Pages and fixed-purpose same-origin BFF routes
+src/features/catalog/     Existing catalog adapters, queries and presentation
+src/features/auth/        Credential/user validation, session lifecycle and UI
+src/features/cart/        Guest operations, account adapter, merge engine and UI
+src/lib/api/              Guarded server transport, configuration and safe errors
+src/lib/bff/              Encrypted file store, locks, CSRF, cookies and responses
+src/components/           Shared layout and presentation primitives
 ```
 
-Runtime data flows from route → feature server query → feature API adapter → guarded HTTP client → Laravel. Validated feature values flow back into presentation. Shared infrastructure has no catalog dependencies. New feature directories should be introduced only when that feature is implemented.
+Browser ? opaque HttpOnly cookie ? Next.js BFF ? server-held Sanctum bearer token ? Laravel. The backend uses bearer authentication, with Sanctum SPA cookie authentication disabled. No Laravel cookie/CSRF/CORS flow is assumed. Browser mutations require exact origin verification, SameSite cookies and a session CSRF token. API responses are private and uncached. Backend authorization remains authoritative.
 
-The four existing integration endpoints remain `GET /api/products`, `/api/categories`, `/api/products/{id}` and `/api/products/{id}/price`. Independent reads run concurrently. There are no per-card price requests. Requests use explicit `no-store`, JSON acceptance, omitted credentials, an eight-second timeout and disabled redirects. Runtime validation checks JSON/media type, response fields, product identity and pagination consistency. Failures become safe typed errors; raw upstream diagnostics are never shown. No browser cookies or tokens are forwarded by the public client.
+The persistent store supports **one Node host with durable private local disk**. Multiple processes on that host share exclusive file locks; serverless and multiple hosts are unsupported. Production requires all of:
 
-The homepage explicitly stays request-rendered even when deployment configuration is unavailable during the build. Price failure keeps product information visible; category failure keeps search/sorting usable. Response headers add `nosniff`, frame denial, a referrer policy and restricted browser permissions. Personalized caching and mutation transport are not added speculatively.
+```dotenv
+APP_ORIGIN=https://shop.example
+LARAVEL_API_URL=https://api.example/api
+SESSION_DEPLOYMENT=single-host
+SESSION_STORE_DIRECTORY=<absolute private durable directory outside every web root>
+SESSION_ENCRYPTION_KEY=<random 32-byte base64 secret supplied privately>
+```
 
-Phase 1 documents:
+Provision the directory and restrictive service-account ACLs before deployment. Do not use a directory beneath this repository or `htdocs`, or a temporary/ephemeral volume. Production fails safely when configuration is missing; there is no memory-store fallback. The encryption key and session directory must survive restarts together. Real remote deployments require HTTPS; explicit loopback HTTP supports local production-build tests only. See the [Phase 2 report](docs/phase-2-auth-cart.md) for operations, recovery and remaining release requirements.
 
-- [Architecture assessment and conventions](docs/architecture.md)
-- [Verified backend contract inventory](docs/backend-contracts.md)
-- [Future Sanctum authentication strategy](docs/authentication-strategy.md)
-- [Changed-file manifest, validation, risks and roadmap](docs/phase-1-report.md)
-
-The backend currently uses **Sanctum bearer tokens, not SPA session-cookie login**. The recommended future integration is a same-origin Next.js BFF with an opaque HttpOnly frontend session and protected server-side token storage. That strategy is documented only; no auth routes or token storage were implemented.
-
-## Checks and development commands
+## Validation
 
 ```powershell
-npm.cmd run dev
 npm.cmd run lint
 npm.cmd run typecheck
 npm.cmd run format:check
 npm.cmd run test:unit
 npm.cmd run build
 npm.cmd test
-npm.cmd start
+npm.cmd audit --omit=dev
+npm.cmd audit
 ```
 
-`test:unit` runs configuration/contract tests and local HTTP integration checks without Laravel, Edge or a production build. `npm.cmd test` runs both test projects using an already built frontend and an existing populated Laravel API. `npm.cmd run test:e2e` runs only storefront regressions. Focus a run with `npm.cmd test -- --grep "test name"`.
+`test:unit` is independent of Laravel and browsers. `npm.cmd test` uses the existing production build, installed Microsoft Edge and an existing populated catalog at `TEST_API_BASE_URL` (default `http://127.0.0.1:8000/api`). `test:e2e` runs browser/BFF integration checks only. Focus with `npm.cmd test -- --grep "test name"`.
 
-Browser tests use installed Microsoft Edge (`channel: msedge`). Configure another supported browser if needed. Tests reserve ports 3100 and 8101, refuse to reuse existing servers, and stop only their own Node processes. Set `TEST_API_BASE_URL` to test another existing API. The test-only relay forwards GET requests to Laravel and injects faults only in its own responses; control writes never reach Laravel. It does not create fixtures, authenticate or mutate backend data.
+Tests reserve ports 3100, 8101 and 8102, refuse occupied ports and stop only processes they launch. **All authentication/cart mutations go to an isolated test-only Node fixture**, with credentials and keys generated per run. Only public catalog GETs reach the actual Laravel API. No backend database fixtures are created. Local expiry tests alter only their own encrypted temporary frontend session records. This isolation is essential because even Laravel `GET /cart` can create database records.
 
-The suite covers real catalog results, filtering, sorting, pagination, stock, exact monetary values, unavailable/malformed responses, timeouts, partial failures, mismatched product identities, response headers, streamed loading HTML, keyboard access and overflow at 320/375/768/1440 pixels. Transient browser skeleton visibility is not reliably observable here; direct streaming is verified instead. With a dev server at `http://localhost:3000`, `node tests/support/capture.mjs` saves ignored desktop/mobile screenshots.
+The suite has 35 unit/transport checks and 25 browser/BFF integration checks, covering the prior storefront regressions plus authentication, token privacy, CSRF, rotation, expiry, ownership, partial/uncertain merges, logout/relogin, account switching, cross-tab state, corrupted/unavailable storage, price/stock refresh and responsive layouts. Authenticated live-Laravel acceptance testing remains a separate task for an authorized disposable environment.
 
-## Security and remaining work
+The audit reports zero production vulnerabilities and eight existing moderate findings in the development lint chain. No forced downgrade, audit fix or dependency upgrade was applied.
 
-The dependency audit currently reports eight moderate development-tool findings through the ESLint/TypeScript lint chain and zero production-dependency vulnerabilities. The suggested automated fix downgrades `eslint-config-next`; no forced fix or upgrades were applied. Details and final check results are in the Phase 1 report.
+## Documentation and next work
 
-Future phases must establish server sessions, CSRF/mutation protection, authorization, isolated authenticated tests, deployment TLS/HSTS/CSP, rate limiting and operational monitoring before release. The backend has no exposed refresh/password-reset/profile-update contracts, no admin capability in the user resource and no real gateway/shipping contract. Document these limits rather than inventing flows. See the roadmap for the recommended sequence. No backend modifications, commits, pushes, merges or releases were performed.
+- [Phase 2 implementation, merge algorithm, file manifest, validation, security risks and manual checks](docs/phase-2-auth-cart.md)
+- [Verified Laravel contract inventory](docs/backend-contracts.md)
+- [Historical Phase 1 architecture assessment](docs/architecture.md)
+- [Historical authentication decision](docs/authentication-strategy.md)
+- [Phase 1 delivery report](docs/phase-1-report.md)
+
+Before release, verify HTTPS cookies, private storage ACLs/durability, proxy rate limits, CSP/HSTS and operational recovery. Merge is neither atomic nor exactly-once: Laravel has no cart idempotency/bulk/CAS contract. Unknown writes are never automatically replayed. The recommended next feature phase is the existing idempotent checkout/mock-payment/order flow, after live integration acceptance and deployment hardening. No backend changes, commits, pushes, merges or releases are performed by this work.

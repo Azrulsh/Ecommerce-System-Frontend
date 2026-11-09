@@ -8,6 +8,7 @@ export type ApiErrorCode =
   | "not_found"
   | "validation"
   | "conflict"
+  | "import_account_mismatch"
   | "rate_limited"
   | "unavailable"
   | "http";
@@ -22,6 +23,8 @@ const messages: Record<ApiErrorCode, string> = {
   not_found: "This item is unavailable.",
   validation: "Please check the submitted information.",
   conflict: "The information has changed. Please review it and try again.",
+  import_account_mismatch:
+    "This interrupted import belongs to another account. Sign in to that account to finish reviewing it, or sign out to explicitly clear the remaining guest items.",
   rate_limited: "Too many requests. Please try again shortly.",
   unavailable: "The service is temporarily unavailable.",
   http: "The service could not complete this request.",
@@ -32,6 +35,7 @@ export class ApiError extends Error {
     public readonly code: ApiErrorCode,
     public readonly status?: number,
     public readonly retryAfterSeconds?: number,
+    public readonly fieldNames?: readonly string[],
   ) {
     super(messages[code]);
     this.name = "ApiError";

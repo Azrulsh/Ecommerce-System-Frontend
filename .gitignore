@@ -37,6 +37,7 @@ yarn-error.log*
 # browser verification
 /test-results/
 /playwright-report/
+/.runtime/
 
 # vercel
 .vercel

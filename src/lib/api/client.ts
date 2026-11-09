@@ -1,9 +1,23 @@
 import "server-only";
 import { resolveApiConfig } from "./config";
-import { requestJson } from "./request";
+import { requestJson, type ApiRequestOptions } from "./request";
 export async function apiGet<T>(
   path: string,
   parse: (value: unknown) => T,
 ): Promise<T> {
   return requestJson(resolveApiConfig(process.env), path, parse);
+}
+
+export async function apiRequest<T>(
+  path: string,
+  parse: (value: unknown) => T,
+  options: ApiRequestOptions,
+) {
+  return requestJson(
+    resolveApiConfig(process.env),
+    path,
+    parse,
+    fetch,
+    options,
+  );
 }

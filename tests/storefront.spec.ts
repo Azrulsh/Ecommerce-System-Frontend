@@ -181,7 +181,12 @@ test("out-of-stock details retain authoritative public pricing", async ({
     ).json(),
   );
   await page.goto(`/products/${product!.id}`);
-  await expect(page.getByText("Out of stock", { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("paragraph").filter({ hasText: /^Out of stock$/ }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Out of stock", exact: true }),
+  ).toBeDisabled();
   await expect(
     page.getByText(formatMoney(price.final_price), { exact: true }).first(),
   ).toBeVisible();

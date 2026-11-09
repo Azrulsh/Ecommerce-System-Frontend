@@ -1,5 +1,5 @@
 import "server-only";
-import { apiGet } from "@/lib/api/client";
+import { apiGet, apiRequest } from "@/lib/api/client";
 import {
   InvalidApiResponse,
   parseProduct,
@@ -19,10 +19,14 @@ export function getProduct(id: string) {
     return product;
   });
 }
-export function getProductPrice(id: string) {
-  return apiGet(`products/${encodeURIComponent(id)}/price`, (value) => {
-    const price = parseProductPrice(value);
-    if (String(price.product_id) !== id) throw new InvalidApiResponse();
-    return price;
-  });
+export function getProductPrice(id: string, token?: string) {
+  return apiRequest(
+    `products/${encodeURIComponent(id)}/price`,
+    (value) => {
+      const price = parseProductPrice(value);
+      if (String(price.product_id) !== id) throw new InvalidApiResponse();
+      return price;
+    },
+    { token },
+  );
 }

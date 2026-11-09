@@ -14,12 +14,44 @@ const modes = new Set([
   "timeout",
   "wrong-product",
   "wrong-price",
+  "stock-zero",
+  "price-change",
 ]);
 
 createServer(async (request, response) => {
   const url = new URL(request.url ?? "/", "http://127.0.0.1:8101");
   if (url.pathname === "/health") {
     response.end("ready");
+    return;
+  }
+  if (
+    /^\/api\/(?:login|register|logout|user|cart(?:\/items(?:\/\d+)?)?)$/.test(
+      url.pathname,
+    )
+  ) {
+    // Authentication/cart writes are redirected ONLY to the isolated fixture.
+    try {
+      const chunks = [];
+      for await (const chunk of request) chunks.push(chunk);
+      const result = await fetch(`http://127.0.0.1:8102${url.pathname}`, {
+        method: request.method,
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          ...(request.headers.authorization
+            ? { Authorization: request.headers.authorization }
+            : {}),
+        },
+        ...(["GET", "HEAD"].includes(request.method)
+          ? {}
+          : { body: Buffer.concat(chunks) }),
+        signal: AbortSignal.timeout(10_000),
+      });
+      response.writeHead(result.status, { "Content-Type": "application/json" });
+      response.end(await result.text());
+    } catch {
+      response.writeHead(503).end();
+    }
     return;
   }
   if (url.pathname === "/__test/mode" && request.method === "POST") {
@@ -67,6 +99,24 @@ createServer(async (request, response) => {
       },
     );
     response.writeHead(result.status, { "Content-Type": "application/json" });
+    if (
+      result.ok &&
+      ((currentMode === "stock-zero" &&
+        /^\/api\/products\/\d+$/.test(url.pathname)) ||
+        (currentMode === "price-change" && url.pathname.endsWith("/price")))
+    ) {
+      const payload = await result.json();
+      if (currentMode === "stock-zero") payload.data.stock_quantity = 0;
+      else
+        Object.assign(payload.data, {
+          original_price: "123.45",
+          final_price: "123.45",
+          discount_amount: "0.00",
+          applied_discount: null,
+        });
+      response.end(JSON.stringify(payload));
+      return;
+    }
     if (
       result.ok &&
       ((currentMode === "wrong-product" &&

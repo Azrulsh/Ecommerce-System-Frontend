@@ -1,6 +1,8 @@
 ﻿import type { Metadata } from "next";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { CommerceProvider } from "@/features/cart/components/CommerceProvider";
+import { CommerceNotice } from "@/features/cart/components/CommerceNotice";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -23,11 +25,14 @@ export default function RootLayout({
         <a href="#main-content" className="skip-link">
           Skip to content
         </a>
-        <Header />
-        <main id="main-content" className="flex-1" tabIndex={-1}>
-          {children}
-        </main>
-        <Footer />
+        <CommerceProvider>
+          <Header />
+          <CommerceNotice />
+          <main id="main-content" className="flex-1" tabIndex={-1}>
+            {children}
+          </main>
+          <Footer />
+        </CommerceProvider>
       </body>
     </html>
   );

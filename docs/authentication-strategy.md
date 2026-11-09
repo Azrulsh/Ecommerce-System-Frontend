@@ -1,5 +1,9 @@
 # Sanctum integration decision for a future phase
 
+Historical Phase 1 decision. The selected BFF approach is now implemented; see
+the [Phase 2 implementation report](phase-2-auth-cart.md). The assessment below
+records the original rationale and is not the current feature inventory.
+
 Status: assessment only; no authentication UI, API handlers, sessions, tokens or storage were implemented in Phase 1.
 
 ## Verified backend mode

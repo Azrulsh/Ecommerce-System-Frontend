@@ -109,20 +109,23 @@ export function parseProducts(value: unknown): ProductPage {
 }
 export function parseProductPrice(value: unknown): ProductPrice {
   const item = record(record(value).data);
-  const discount =
-    item.applied_discount === null ? null : record(item.applied_discount);
   return {
     product_id: integer(item.product_id, 1),
     original_price: money(item.original_price),
     discount_amount: money(item.discount_amount),
     final_price: money(item.final_price),
-    applied_discount:
-      discount === null
-        ? null
-        : {
-            id: integer(discount.id, 1),
-            name: text(discount.name),
-            type: text(discount.type),
-          },
+    applied_discount: parseAppliedDiscount(item.applied_discount),
   };
+}
+export function parseAppliedDiscount(
+  value: unknown,
+): ProductPrice["applied_discount"] {
+  const discount = value === null ? null : record(value);
+  return discount === null
+    ? null
+    : {
+        id: integer(discount.id, 1),
+        name: text(discount.name),
+        type: text(discount.type),
+      };
 }

@@ -1,5 +1,9 @@
 # Phase 1 architecture assessment and foundation
 
+Historical Phase 1 assessment. Authentication and cart are now implemented; see
+the [Phase 2 implementation report](phase-2-auth-cart.md) for current boundaries,
+deployment requirements and validation.
+
 Assessment date: 9 November 2026. Scope: frontend foundation only. Laravel was inspected as a read-only contract reference; no authenticated or mutating workflows were executed.
 
 ## Starting architecture

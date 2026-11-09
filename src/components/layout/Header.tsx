@@ -1,14 +1,28 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { ArrowUpRight, Asterisk, Menu, X } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { ShoppingBag, Asterisk, Menu, X, UserRound } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useCommerce } from "@/features/cart/components/CommerceProvider";
 
 export function Header() {
   const pathname = usePathname();
+  const router = useRouter();
+  const commerce = useCommerce();
+  const count = commerce.session?.user
+    ? (commerce.cart?.items.reduce((sum, item) => sum + item.quantity, 0) ?? 0)
+    : commerce.guest.items.reduce((sum, item) => sum + item.quantity, 0);
+  const signOut = () =>
+    void commerce
+      .logout()
+      .then(() => {
+        router.replace("/cart");
+        router.refresh();
+      })
+      .catch(() => undefined);
   const [open, setOpen] = useState(false);
   const menuButton = useRef<HTMLButtonElement>(null);
   useEffect(() => {
@@ -63,27 +77,62 @@ export function Header() {
             </Link>
           ))}
         </nav>
-        <Link
-          href="/products"
-          className={cn(
-            buttonVariants({ variant: "outline", size: "sm" }),
-            "hidden sm:inline-flex",
+        <div className="flex items-center gap-2">
+          <Link
+            href="/cart"
+            prefetch={false}
+            aria-label={
+              commerce.loading ? "Cart, loading" : `Cart, ${count} items`
+            }
+            className="relative flex min-h-11 min-w-11 items-center justify-center rounded-lg text-teal-800 hover:bg-teal-50"
+          >
+            <ShoppingBag size={21} aria-hidden="true" />
+            <span
+              data-testid="cart-count"
+              className="absolute -right-1 -top-1 min-w-5 rounded-full bg-teal-700 px-1 text-center text-[10px] leading-5 text-white"
+            >
+              {commerce.loading ? "…" : count}
+            </span>
+          </Link>
+          <Link
+            href={commerce.session?.user ? "/account" : "/login"}
+            prefetch={false}
+            className={cn(
+              buttonVariants({ variant: "outline", size: "sm" }),
+              "hidden sm:inline-flex",
+            )}
+          >
+            <UserRound size={15} aria-hidden="true" />
+            {commerce.loading
+              ? "Please wait"
+              : commerce.session?.user
+                ? "Account"
+                : "Sign in"}
+          </Link>
+          {commerce.session?.user && (
+            <Button
+              variant="ghost"
+              size="sm"
+              disabled={commerce.busy || commerce.loading}
+              className="hidden md:inline-flex"
+              onClick={signOut}
+            >
+              Sign out
+            </Button>
           )}
-        >
-          Find something good <ArrowUpRight size={15} aria-hidden="true" />
-        </Link>
-        <Button
-          ref={menuButton}
-          variant="ghost"
-          size="icon"
-          className="sm:hidden"
-          aria-label={open ? "Close navigation" : "Open navigation"}
-          aria-expanded={open}
-          aria-controls="mobile-nav"
-          onClick={() => setOpen(!open)}
-        >
-          {open ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
-        </Button>
+          <Button
+            ref={menuButton}
+            variant="ghost"
+            size="icon"
+            className="sm:hidden"
+            aria-label={open ? "Close navigation" : "Open navigation"}
+            aria-expanded={open}
+            aria-controls="mobile-nav"
+            onClick={() => setOpen(!open)}
+          >
+            {open ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
+          </Button>
+        </div>
       </div>
       <nav
         id="mobile-nav"
@@ -101,6 +150,26 @@ export function Header() {
             {link.label}
           </Link>
         ))}
+        <Link
+          href={commerce.session?.user ? "/account" : "/login"}
+          prefetch={false}
+          onClick={() => setOpen(false)}
+          className="block rounded-lg px-3 py-3 text-sm font-medium text-teal-800"
+        >
+          {commerce.session?.user ? "Your account" : "Sign in / register"}
+        </Link>
+        {commerce.session?.user && (
+          <Button
+            variant="ghost"
+            disabled={commerce.busy}
+            onClick={() => {
+              setOpen(false);
+              signOut();
+            }}
+          >
+            Sign out
+          </Button>
+        )}
       </nav>
     </header>
   );
