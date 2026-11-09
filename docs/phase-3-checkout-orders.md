@@ -1,5 +1,8 @@
 # Phase 3: checkout, mock payments and customer orders
 
+Accepted Phase 3 baseline. Wishlist and reviews are now implemented separately in
+the [Phase 4 report](phase-4-wishlist-reviews.md); the guarantees below remain in place.
+
 Implemented on 9 November 2026, building on the manually accepted Phase 1/2 foundation. All changes are confined to `ecommerce-frontend`. Laravel files, configuration, tests and database remain unchanged. Automated checkout/payment traffic never reaches the real backend. No dependencies, commits, pushes, merges, tags or releases were introduced.
 
 ## Implemented customer experience

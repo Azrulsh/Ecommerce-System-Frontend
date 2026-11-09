@@ -9,6 +9,8 @@ import { ProductPlaceholder } from "./ProductPlaceholder";
 import { ProductPrice } from "./ProductPrice";
 import { ApiNotice } from "@/components/ui/api-notice";
 import { AddToCart } from "@/features/cart/components/AddToCart";
+import { WishlistButton } from "@/features/wishlist/components/WishlistButton";
+import { ProductReviews } from "@/features/reviews/components/ProductReviews";
 
 export function ProductDetails({
   product,
@@ -75,6 +77,7 @@ export function ProductDetails({
               stock={product.stock_quantity}
               quantityControl
             />
+            <WishlistButton productId={product.id} />
             <h2 className="text-sm font-semibold">The details</h2>
             <p className="mt-3 whitespace-pre-line break-words text-sm leading-7 text-slate-600">
               {product.description ??
@@ -82,11 +85,12 @@ export function ProductDetails({
             </p>
           </div>
           <p className="mt-8 text-xs leading-6 text-slate-500">
-            Adding items does not reserve inventory. Checkout is planned for a
-            future phase.
+            Adding items does not reserve inventory. Current availability and
+            final prices are verified at checkout.
           </p>
         </div>
       </div>
+      <ProductReviews productId={product.id} />
     </div>
   );
 }

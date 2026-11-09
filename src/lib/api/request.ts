@@ -101,6 +101,8 @@ export async function requestJson<T>(
               "password_confirmation",
               "quantity",
               "product_id",
+              "rating",
+              "comment",
             ].includes(key),
           );
       } catch {

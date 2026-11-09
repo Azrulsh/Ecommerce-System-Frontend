@@ -2,6 +2,7 @@
 import { createServer } from "node:http";
 import { randomBytes } from "node:crypto";
 import { purchaseFixture } from "./purchase-api-fixture.mjs";
+import { engagementFixture } from "./engagement-api-fixture.mjs";
 
 const password = process.env.FIXTURE_PASSWORD;
 if (!password)
@@ -109,6 +110,12 @@ const purchases = purchaseFixture({
   carts: () => carts,
   mode: () => mode,
 });
+const engagement = engagementFixture({
+  product,
+  mode: () => mode,
+  users: () => users,
+  body,
+});
 createServer(async (request, response) => {
   const url = new URL(request.url ?? "/", "http://127.0.0.1:8102");
   const send = (status, value) => {
@@ -141,6 +148,7 @@ createServer(async (request, response) => {
           })),
         );
       await purchases.reset(input);
+      engagement.reset(input);
       return send(200, { users });
     }
     if (url.pathname === "/__test/mode" && request.method === "POST") {
@@ -152,6 +160,7 @@ createServer(async (request, response) => {
         carts: Object.fromEntries(carts),
         tokens: [...tokens.keys()],
         ...purchases.state(),
+        ...engagement.state(),
       });
     if (url.pathname === "/api/register" && request.method === "POST") {
       const data = await body(request);
@@ -192,6 +201,7 @@ createServer(async (request, response) => {
       tokens.set(token, user.id);
       return send(200, { data: { user, token_type: "Bearer", token } });
     }
+    if (await engagement.public(request, url, send)) return;
     const token = request.headers.authorization?.replace(/^Bearer /, "");
     const userId = tokens.get(token);
     if (!userId) return send(401, { message: "Unauthenticated." });
@@ -204,6 +214,7 @@ createServer(async (request, response) => {
       return send(204, null);
     }
     if (await purchases.handle(request, url, userId, send)) return;
+    if (await engagement.authenticated(request, url, userId, send)) return;
     if (mode.cartStatus)
       return send(mode.cartStatus, { message: "Fixture cart failure." });
     if (url.pathname === "/api/cart" && request.method === "GET")

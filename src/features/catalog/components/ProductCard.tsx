@@ -4,6 +4,7 @@ import type { Product } from "@/features/catalog/types/product.types";
 import { formatMoney } from "@/lib/format";
 import { ProductPlaceholder } from "./ProductPlaceholder";
 import { AddToCart } from "@/features/cart/components/AddToCart";
+import { WishlistButton } from "@/features/wishlist/components/WishlistButton";
 
 export function ProductCard({ product }: { product: Product }) {
   return (
@@ -47,6 +48,7 @@ export function ProductCard({ product }: { product: Product }) {
       </Link>
       <div className="px-5 pb-5">
         <AddToCart productId={product.id} stock={product.stock_quantity} />
+        <WishlistButton productId={product.id} />
       </div>
     </article>
   );

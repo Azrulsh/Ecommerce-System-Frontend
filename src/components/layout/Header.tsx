@@ -7,11 +7,13 @@ import { useEffect, useRef, useState } from "react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useCommerce } from "@/features/cart/components/CommerceProvider";
+import { useWishlist } from "@/features/wishlist/components/WishlistProvider";
 
 export function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const commerce = useCommerce();
+  const wishlist = useWishlist();
   const count = commerce.session?.user
     ? (commerce.cart?.items.reduce((sum, item) => sum + item.quantity, 0) ?? 0)
     : commerce.guest.items.reduce((sum, item) => sum + item.quantity, 0);
@@ -39,6 +41,11 @@ export function Header() {
   const links = [
     { href: "/", label: "Home" },
     { href: "/products", label: "The collection" },
+    {
+      href: "/wishlist",
+      label:
+        wishlist.count === null ? "Wishlist" : `Wishlist (${wishlist.count})`,
+    },
     ...(commerce.session?.user ? [{ href: "/orders", label: "Orders" }] : []),
   ];
   return (
@@ -57,7 +64,7 @@ export function Header() {
         </Link>
         <nav
           aria-label="Main navigation"
-          className="hidden items-center gap-4 md:flex lg:gap-8"
+          className="hidden items-center gap-5 lg:flex"
         >
           {links.map((link) => (
             <Link
@@ -125,7 +132,7 @@ export function Header() {
             ref={menuButton}
             variant="ghost"
             size="icon"
-            className="md:hidden"
+            className="lg:hidden"
             aria-label={open ? "Close navigation" : "Open navigation"}
             aria-expanded={open}
             aria-controls="mobile-nav"
@@ -139,7 +146,7 @@ export function Header() {
         id="mobile-nav"
         aria-label="Mobile navigation"
         hidden={!open}
-        className="border-t border-slate-100 px-5 py-4 md:hidden"
+        className="border-t border-slate-100 px-5 py-4 lg:hidden"
       >
         {links.map((link) => (
           <Link

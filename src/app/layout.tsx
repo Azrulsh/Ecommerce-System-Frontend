@@ -3,6 +3,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { CommerceProvider } from "@/features/cart/components/CommerceProvider";
 import { CommerceNotice } from "@/features/cart/components/CommerceNotice";
+import { WishlistProvider } from "@/features/wishlist/components/WishlistProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -26,12 +27,14 @@ export default function RootLayout({
           Skip to content
         </a>
         <CommerceProvider>
-          <Header />
-          <CommerceNotice />
-          <main id="main-content" className="flex-1" tabIndex={-1}>
-            {children}
-          </main>
-          <Footer />
+          <WishlistProvider>
+            <Header />
+            <CommerceNotice />
+            <main id="main-content" className="flex-1" tabIndex={-1}>
+              {children}
+            </main>
+            <Footer />
+          </WishlistProvider>
         </CommerceProvider>
       </body>
     </html>

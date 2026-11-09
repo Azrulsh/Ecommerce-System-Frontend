@@ -1,8 +1,16 @@
 # Phase 1 architecture assessment and foundation
 
-Historical Phase 1 assessment. Authentication and cart are now implemented; see
-the [Phase 2 implementation report](phase-2-auth-cart.md) for current boundaries,
-deployment requirements and validation.
+Historical Phase 1 assessment. Authentication, cart, checkout and orders are implemented;
+the [Phase 4 report](phase-4-wishlist-reviews.md) adds wishlist/review boundaries and
+the current validation results. The [Phase 2 report](phase-2-auth-cart.md) and
+[Phase 3 report](phase-3-checkout-orders.md) describe the retained session and purchase guarantees.
+
+Current browser workflows live in feature hooks/providers and call fixed-purpose
+same-origin BFF routes. Server-only feature adapters validate Laravel responses and
+inject server-held tokens. Wishlist and reviews share a bounded pagination validator;
+their presentation reuses existing UI and cart controls. No new session store, HTTP
+client, dependency or cross-feature repository hierarchy was introduced. Earlier
+GET-only transport and unimplemented-feature statements below describe Phase 1.
 
 Assessment date: 9 November 2026. Scope: frontend foundation only. Laravel was inspected as a read-only contract reference; no authenticated or mutating workflows were executed.
 

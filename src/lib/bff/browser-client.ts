@@ -48,9 +48,14 @@ export async function browserRequest<T>(
         ? data.fields.filter(
             (field): field is string =>
               typeof field === "string" &&
-              ["name", "email", "password", "password_confirmation"].includes(
-                field,
-              ),
+              [
+                "name",
+                "email",
+                "password",
+                "password_confirmation",
+                "rating",
+                "comment",
+              ].includes(field),
           )
         : [];
       throw new ApiError(code, response.status, undefined, fields);

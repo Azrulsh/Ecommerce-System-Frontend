@@ -25,7 +25,7 @@ createServer(async (request, response) => {
     return;
   }
   if (
-    /^\/api\/(?:login|register|logout|user|cart(?:\/items(?:\/\d+)?)?|checkout|orders(?:\/\d+(?:\/payment)?)?)$/.test(
+    /^\/api\/(?:login|register|logout|user|cart(?:\/items(?:\/\d+)?)?|checkout|orders(?:\/\d+(?:\/payment)?)?|wishlist(?:\/items(?:\/\d+)?)?|products\/\d+\/reviews|reviews\/\d+)$/.test(
       url.pathname,
     )
   ) {

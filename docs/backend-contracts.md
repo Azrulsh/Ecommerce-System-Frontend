@@ -78,6 +78,9 @@ Customer cancellation or a real gateway is not exposed by these routes. No addre
 
 ## Wishlist and reviews
 
+Phase 4 reverifies these contracts and implements them in the customer storefront;
+see [wishlist and reviews](phase-4-wishlist-reviews.md) for browser endpoints and limitations.
+
 | Endpoint                             | Contract                                                                                                              |
 | ------------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
 | `GET /wishlist`                      | Authenticated, paginated; `id`, `product_id`, `is_available`, loaded product, `created_at`                            |
@@ -86,9 +89,24 @@ Customer cancellation or a real gateway is not exposed by these routes. No addre
 | `GET /products/{product}/reviews`    | Public paginated ReviewResource collection plus top-level `summary: { average_rating: string \| null, review_count }` |
 | `POST /products/{product}/reviews`   | Authenticated; rating integer 1–5, nullable comment up to 5000 characters; 201; duplicate customer review 409         |
 | `PATCH /reviews/{review}`            | Owner-only; optional rating update; ReviewResource                                                                    |
-| `DELETE /reviews/{review}`           | Owner-only; 204                                                                                                       |
+| `DELETE /reviews/{review}`           | Owner or backend administrator; 204; customer UI exposes own reviews only                                             |
 
 Reviews contain `id`, `product_id`, `rating`, `comment`, loaded `reviewer: { id, name }` and timestamps. Do not invent verified-purchase flags. Customer identity is derived on the backend. Sources: corresponding controllers, requests, resources, policies and `ReviewsAndWishlistTest`.
+
+Both lists use descending IDs and `PaginationRequest` (`page >= 1`, `per_page` 1–100,
+default 15). Wishlist availability means active and not soft-deleted, independently
+of stock. The relationship loads soft-deleted products, so unavailable entries may
+still contain product details. Saving inactive/deleted/missing products returns 404;
+removal of an absent item returns 404. Wishlist mutations are limited to 30/minute/user.
+
+Review creation requires authentication and an active/non-deleted product, with one
+review per customer/product (409 duplicate). There is no purchase/order-history
+eligibility test, moderation state or verified-purchase field. Listing and editing
+inactive/deleted products return 404; an owner may still delete their review. Update
+requires ownership even for an admin; delete also permits backend admins. Ownership
+denials deliberately return 404. Review mutations are limited to 10/minute/user.
+There is no customer-review lookup, review GET by ID, wishlist membership lookup,
+bulk save, review revision/conditional write or review idempotency endpoint.
 
 ## Administration
 
