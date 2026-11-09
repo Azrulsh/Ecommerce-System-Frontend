@@ -1,26 +1,97 @@
-@import "tailwindcss";
+﻿@import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --primary: #0f766e;
+  --primary-foreground: #ffffff;
+  --muted: #e9eef1;
+  --muted-foreground: #64748b;
+  --border: #e2e8f0;
+  --ring: #0f766e;
+  --radius: 0.75rem;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  --font-sans: Arial, Helvetica, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  button,
+  summary,
+  select {
+    cursor: pointer;
+  }
+  button:disabled {
+    cursor: default;
+  }
+  :focus-visible {
+    outline: 3px solid #0f766e;
+    outline-offset: 4px;
+  }
+  ::selection {
+    background: #99f6e4;
+    color: #134e4a;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  .page-width {
+    @apply mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-12;
+  }
+  .eyebrow {
+    @apply mb-2 text-xs font-semibold uppercase tracking-[0.15em] text-teal-700;
+  }
+  .section-heading {
+    @apply mb-7 flex flex-wrap items-end justify-between gap-4;
+  }
+  .section-heading h2 {
+    @apply text-2xl font-medium tracking-tight sm:text-3xl;
+  }
+  .text-link {
+    @apply inline-flex items-center gap-1.5 text-sm font-semibold text-teal-700 underline-offset-4 hover:underline;
+  }
+  .field {
+    @apply h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-800 shadow-xs;
+  }
+  .field-label {
+    @apply mb-2 block text-xs font-semibold text-slate-600;
+  }
+  .hero {
+    background:
+      radial-gradient(ellipse at 80% 15%, #168f81 0%, transparent 55%),
+      linear-gradient(115deg, #103f3d, #0f766e);
+  }
+  .hero :focus-visible {
+    outline-color: #5eead4;
+  }
+  .hero-tile {
+    @apply flex size-48 items-center justify-center rounded-[2.5rem] border border-white/25 bg-gradient-to-br from-teal-100/25 to-teal-900/10 text-teal-100 shadow-2xl backdrop-blur-sm;
+  }
+  .skip-link {
+    @apply fixed left-4 top-4 z-50 -translate-y-24 rounded-lg bg-white px-5 py-3 font-semibold text-teal-800 shadow-lg focus:translate-y-0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
