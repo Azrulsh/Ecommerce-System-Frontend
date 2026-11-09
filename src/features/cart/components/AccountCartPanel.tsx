@@ -118,19 +118,24 @@ export function AccountCartPanel() {
             </dl>
             {!commerce.cart.is_ready && (
               <p className="mt-4 text-sm text-rose-800">
-                Resolve the availability issues before a future checkout.
+                Resolve the availability issues before checkout.
               </p>
             )}
             <Button
               className="mt-6 w-full"
-              disabled={commerce.busy || !!commerce.guest.pending}
-              onClick={() => router.replace("/cart?checkout=next-phase")}
+              disabled={
+                commerce.busy ||
+                !!commerce.guest.pending ||
+                commerce.guest.items.length > 0 ||
+                !commerce.cart.is_ready
+              }
+              onClick={() => router.push("/checkout")}
             >
               Proceed to checkout
             </Button>
             <p className="mt-3 text-xs leading-5 text-slate-600">
-              Checkout is not available yet. Prices and availability may change;
-              adding items does not reserve stock.
+              Demo checkout uses simulated payment only. No real money is
+              charged. Resolve remaining guest items before continuing.
             </p>
           </aside>
         </div>

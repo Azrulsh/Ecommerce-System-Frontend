@@ -5,6 +5,8 @@ export interface ApiRequestOptions {
   method?: "GET" | "POST" | "PATCH" | "DELETE";
   token?: string;
   body?: unknown;
+  idempotencyKey?: string;
+  parseError?: (status: number, value: unknown) => ApiError | undefined;
 }
 
 function requestUrl(baseUrl: string, path: string): URL {
@@ -48,6 +50,11 @@ export async function requestJson<T>(
     headers.Authorization = `Bearer ${options.token}`;
   }
   if (options.body !== undefined) headers["Content-Type"] = "application/json";
+  if (options.idempotencyKey !== undefined) {
+    if (!/^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/.test(options.idempotencyKey))
+      throw new ApiError("configuration");
+    headers["Idempotency-Key"] = options.idempotencyKey;
+  }
   let response: Response;
   try {
     response = await fetcher(url, {
@@ -73,9 +80,11 @@ export async function requestJson<T>(
       response.headers.get("retry-after"),
     );
     let fields: string[] | undefined;
-    if (response.status === 422) {
+    if (response.status === 422 || options.parseError) {
+      let mapped: ApiError | undefined;
       try {
         const data: unknown = await response.json();
+        mapped = options.parseError?.(response.status, data);
         if (
           data &&
           typeof data === "object" &&
@@ -97,6 +106,7 @@ export async function requestJson<T>(
       } catch {
         if (signal.aborted) throw new ApiError("timeout", response.status);
       }
+      if (mapped) throw mapped;
     } else {
       await response.body?.cancel().catch(() => undefined);
     }

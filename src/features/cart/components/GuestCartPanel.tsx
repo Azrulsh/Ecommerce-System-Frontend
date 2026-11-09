@@ -162,13 +162,13 @@ export function GuestCartPanel({ returnTo }: { returnTo: string }) {
             stock may change. Account pricing may differ after sign-in.
           </p>
           <Link
-            href="/login?next=%2Fcart%3Fcheckout%3Dnext-phase"
+            href="/login?next=%2Fcheckout"
             className={buttonVariants({ className: "mt-5" })}
           >
             Proceed to checkout
           </Link>
           <Link
-            href="/register?next=%2Fcart%3Fcheckout%3Dnext-phase"
+            href="/register?next=%2Fcheckout"
             className="ml-4 inline-block text-sm font-semibold text-teal-800 underline"
           >
             Create an account

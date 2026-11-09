@@ -33,11 +33,14 @@ export function CartPage({
           role="status"
           className="mb-6 rounded-xl border border-teal-200 bg-teal-50 p-4 text-sm leading-6 text-teal-900"
         >
-          Checkout is planned for a future phase.{" "}
+          Demo checkout is now available.{" "}
           {signedIn
             ? "Your account cart is saved."
             : "Sign in to save your cart, then review guest items before importing."}{" "}
-          No payment will be taken.
+          No real money is charged.{" "}
+          <Link className="text-link" href="/checkout">
+            Continue to checkout review
+          </Link>
         </p>
       )}
       {commerce.loading ? (

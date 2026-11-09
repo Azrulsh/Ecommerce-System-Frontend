@@ -14,7 +14,10 @@ export default async function Cart({
   return (
     <CartPage
       checkoutNotice={query.checkout === "next-phase"}
-      returnTo={safeReturnTo(query.next)}
+      returnTo={safeReturnTo(
+        query.next ??
+          (query.checkout === "next-phase" ? "/checkout" : undefined),
+      )}
     />
   );
 }

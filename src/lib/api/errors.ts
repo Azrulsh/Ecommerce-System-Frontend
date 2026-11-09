@@ -9,6 +9,7 @@ export type ApiErrorCode =
   | "validation"
   | "conflict"
   | "import_account_mismatch"
+  | "mock_payment_declined"
   | "rate_limited"
   | "unavailable"
   | "http";
@@ -25,6 +26,8 @@ const messages: Record<ApiErrorCode, string> = {
   conflict: "The information has changed. Please review it and try again.",
   import_account_mismatch:
     "This interrupted import belongs to another account. Sign in to that account to finish reviewing it, or sign out to explicitly clear the remaining guest items.",
+  mock_payment_declined:
+    "The simulated payment was declined. Checkout was rolled back and your cart was preserved. No real money was charged.",
   rate_limited: "Too many requests. Please try again shortly.",
   unavailable: "The service is temporarily unavailable.",
   http: "The service could not complete this request.",

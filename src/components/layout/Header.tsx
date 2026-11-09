@@ -39,6 +39,7 @@ export function Header() {
   const links = [
     { href: "/", label: "Home" },
     { href: "/products", label: "The collection" },
+    ...(commerce.session?.user ? [{ href: "/orders", label: "Orders" }] : []),
   ];
   return (
     <header className="relative z-20 border-b border-slate-200/80 bg-white">
@@ -56,7 +57,7 @@ export function Header() {
         </Link>
         <nav
           aria-label="Main navigation"
-          className="hidden items-center gap-8 sm:flex"
+          className="hidden items-center gap-4 md:flex lg:gap-8"
         >
           {links.map((link) => (
             <Link
@@ -124,7 +125,7 @@ export function Header() {
             ref={menuButton}
             variant="ghost"
             size="icon"
-            className="sm:hidden"
+            className="md:hidden"
             aria-label={open ? "Close navigation" : "Open navigation"}
             aria-expanded={open}
             aria-controls="mobile-nav"
@@ -138,7 +139,7 @@ export function Header() {
         id="mobile-nav"
         aria-label="Mobile navigation"
         hidden={!open}
-        className="border-t border-slate-100 px-5 py-4 sm:hidden"
+        className="border-t border-slate-100 px-5 py-4 md:hidden"
       >
         {links.map((link) => (
           <Link

@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { ApiError } from "@/lib/api/errors";
 import type { FileStore } from "@/lib/bff/file-store";
+import { markImport } from "./import-review";
 import { array, input, integer, object, string } from "@/lib/validation";
 import type {
   AccountCart,
@@ -76,7 +77,8 @@ export async function mergeCart(
     if (owner !== null && owner !== userId)
       throw new ApiError("import_account_mismatch", 409);
     if (owner === null) await store.write("merge-owner", batch.id, userId);
-    return mergeCartUnderLock(
+    await markImport(store, userId, batch.id, false);
+    const result = await mergeCartUnderLock(
       store,
       userId,
       batch,
@@ -84,6 +86,9 @@ export async function mergeCart(
       acceptCurrent,
       retryFailures,
     );
+    if (result.items.every((line) => line.state === "confirmed"))
+      await markImport(store, userId, batch.id, true);
+    return result;
   });
 }
 

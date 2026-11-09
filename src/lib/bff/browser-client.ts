@@ -38,6 +38,7 @@ export async function browserRequest<T>(
         "validation",
         "conflict",
         "import_account_mismatch",
+        "mock_payment_declined",
         "rate_limited",
         "unavailable",
         "http",

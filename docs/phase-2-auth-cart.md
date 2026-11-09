@@ -1,5 +1,9 @@
 # Phase 2: authentication and cart implementation
 
+Accepted Phase 2 baseline. Checkout and orders are now implemented in the
+[Phase 3 report](phase-3-checkout-orders.md), which supersedes the future-checkout
+notes below and adds persistent cross-device review markers for incomplete cart additions.
+
 Implementation date: 9 November 2026. Scope: customer authentication, server sessions, guest/account carts, reviewed import and lifecycle management. Checkout is a login handoff and future-phase notice only. No backend source, configuration, database, migrations or tests were changed or executed. No dependencies were added. No commits, pushes, merges, tags or releases were created.
 
 ## Implemented architecture

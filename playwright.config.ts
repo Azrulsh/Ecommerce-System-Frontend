@@ -9,9 +9,13 @@ export default defineConfig({
   projects: [
     {
       name: "unit",
-      testMatch: /(?:contracts|api-foundation|auth-cart-unit)\.spec\.ts/,
+      testMatch:
+        /(?:contracts|api-foundation|auth-cart-unit|checkout-unit)\.spec\.ts/,
     },
-    { name: "e2e", testMatch: /(?:storefront|auth-cart)\.spec\.ts/ },
+    {
+      name: "e2e",
+      testMatch: /(?:storefront|auth-cart|checkout-orders)\.spec\.ts/,
+    },
   ],
   use: {
     baseURL: "http://127.0.0.1:3100",

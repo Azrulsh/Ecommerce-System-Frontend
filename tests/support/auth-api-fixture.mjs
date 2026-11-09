@@ -1,6 +1,7 @@
 // Isolated contract fixture. All writes stop here and NEVER reach Laravel.
 import { createServer } from "node:http";
 import { randomBytes } from "node:crypto";
+import { purchaseFixture } from "./purchase-api-fixture.mjs";
 
 const password = process.env.FIXTURE_PASSWORD;
 if (!password)
@@ -31,7 +32,15 @@ async function product(id) {
       ...value.product,
       stock_quantity: mode.stock?.[id] ?? value.product.stock_quantity,
     },
-    price: value.price,
+    price: mode.prices?.[id]
+      ? {
+          ...value.price,
+          final_price: mode.prices[id],
+          applied_discount: mode.discount
+            ? { id: 999, name: "Fixture loyalty discount", type: "loyalty" }
+            : null,
+        }
+      : value.price,
   };
 }
 const decimal = (amount) =>
@@ -95,6 +104,11 @@ async function body(request) {
     return {};
   }
 }
+const purchases = purchaseFixture({
+  summary,
+  carts: () => carts,
+  mode: () => mode,
+});
 createServer(async (request, response) => {
   const url = new URL(request.url ?? "/", "http://127.0.0.1:8102");
   const send = (status, value) => {
@@ -126,6 +140,7 @@ createServer(async (request, response) => {
             quantity: line.quantity,
           })),
         );
+      await purchases.reset(input);
       return send(200, { users });
     }
     if (url.pathname === "/__test/mode" && request.method === "POST") {
@@ -136,6 +151,7 @@ createServer(async (request, response) => {
       return send(200, {
         carts: Object.fromEntries(carts),
         tokens: [...tokens.keys()],
+        ...purchases.state(),
       });
     if (url.pathname === "/api/register" && request.method === "POST") {
       const data = await body(request);
@@ -187,6 +203,7 @@ createServer(async (request, response) => {
       tokens.delete(token);
       return send(204, null);
     }
+    if (await purchases.handle(request, url, userId, send)) return;
     if (mode.cartStatus)
       return send(mode.cartStatus, { message: "Fixture cart failure." });
     if (url.pathname === "/api/cart" && request.method === "GET")

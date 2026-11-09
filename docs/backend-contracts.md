@@ -56,6 +56,13 @@ Summary: `id`, `items`, `subtotal`, `total_savings`, `grand_total`, `is_ready`. 
 
 ## Checkout, mock payment and customer orders
 
+Phase 3 integration is documented in [checkout and orders](phase-3-checkout-orders.md).
+Reverification confirms that mock payment runs **inside** the checkout transaction:
+success creates a `paid` payment; decline returns 409 and rolls back the order,
+payment, stock changes and cart clearing. The only customer payment endpoint is
+GET. No separate payment submission, pending-payment, customer cancellation or
+refund action exists. `X-Mock-Payment` overrides are never sent by this frontend.
+
 | Endpoint                      | Contract                                                                                                 |
 | ----------------------------- | -------------------------------------------------------------------------------------------------------- |
 | `POST /checkout`              | Required `Idempotency-Key` header; first success 201, replay 200; `Idempotency-Replayed` response header |

@@ -84,7 +84,9 @@ export function safeReturnTo(value: unknown): string {
     const url = new URL(value, "https://internal.invalid");
     if (
       url.origin !== "https://internal.invalid" ||
-      !/^(?:\/(?:cart|account)?|\/products(?:\/[1-9]\d*)?)$/.test(url.pathname)
+      !/^(?:\/(?:cart|account|checkout)?|\/products(?:\/[1-9]\d*)?|\/orders(?:\/[1-9]\d*(?:\/(?:confirmation|payment))?)?)$/.test(
+        url.pathname,
+      )
     )
       return "/cart";
     return `${url.pathname}${url.search}`;

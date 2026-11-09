@@ -9,9 +9,11 @@ import { useRouter } from "next/navigation";
 export function AccountGate({
   userId,
   children,
+  returnTo = "/account",
 }: {
   userId: number;
   children: React.ReactNode;
+  returnTo?: string;
 }) {
   const commerce = useCommerce();
   const router = useRouter();
@@ -32,7 +34,10 @@ export function AccountGate({
         <Button className="mt-4" onClick={() => router.refresh()}>
           Reload account
         </Button>
-        <Link className="text-link ml-4" href="/login?next=%2Faccount">
+        <Link
+          className="text-link ml-4"
+          href={`/login?next=${encodeURIComponent(returnTo)}`}
+        >
           Sign in
         </Link>
       </div>

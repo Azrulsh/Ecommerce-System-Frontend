@@ -25,7 +25,7 @@ createServer(async (request, response) => {
     return;
   }
   if (
-    /^\/api\/(?:login|register|logout|user|cart(?:\/items(?:\/\d+)?)?)$/.test(
+    /^\/api\/(?:login|register|logout|user|cart(?:\/items(?:\/\d+)?)?|checkout|orders(?:\/\d+(?:\/payment)?)?)$/.test(
       url.pathname,
     )
   ) {
@@ -33,20 +33,26 @@ createServer(async (request, response) => {
     try {
       const chunks = [];
       for await (const chunk of request) chunks.push(chunk);
-      const result = await fetch(`http://127.0.0.1:8102${url.pathname}`, {
-        method: request.method,
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          ...(request.headers.authorization
-            ? { Authorization: request.headers.authorization }
-            : {}),
+      const result = await fetch(
+        `http://127.0.0.1:8102${url.pathname}${url.search}`,
+        {
+          method: request.method,
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            ...(request.headers.authorization
+              ? { Authorization: request.headers.authorization }
+              : {}),
+            ...(request.headers["idempotency-key"]
+              ? { "Idempotency-Key": request.headers["idempotency-key"] }
+              : {}),
+          },
+          ...(["GET", "HEAD"].includes(request.method)
+            ? {}
+            : { body: Buffer.concat(chunks) }),
+          signal: AbortSignal.timeout(10_000),
         },
-        ...(["GET", "HEAD"].includes(request.method)
-          ? {}
-          : { body: Buffer.concat(chunks) }),
-        signal: AbortSignal.timeout(10_000),
-      });
+      );
       response.writeHead(result.status, { "Content-Type": "application/json" });
       response.end(await result.text());
     } catch {

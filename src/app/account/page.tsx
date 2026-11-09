@@ -47,10 +47,16 @@ export default async function AccountPage() {
               View your cart
             </Link>
             <AccountActions />
+            <Link
+              href="/orders"
+              className={buttonVariants({ variant: "outline" })}
+            >
+              Your orders
+            </Link>
           </div>
           <p className="mt-6 text-xs leading-6 text-slate-500">
-            Sign in to access your private account details and saved cart.
-            Checkout and order management are planned for a later phase.
+            Sign in to access your private account details and saved cart. View
+            your demo orders and their recorded payment status here.
           </p>
         </div>
       </div>
