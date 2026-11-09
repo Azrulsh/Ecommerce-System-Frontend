@@ -1,5 +1,11 @@
 # Phase 1 architecture assessment and foundation
 
+Current administration is documented in the [Phase 5 report](phase-5-admin-dashboard.md).
+It reuses the existing session/BFF boundary, validates a protected Laravel read to
+establish capability, and rechecks it for every privileged operation. Admin pages
+check authorization individually; a persistent layout is not the authorization
+boundary. The accepted customer modules retain their behavior.
+
 Historical Phase 1 assessment. Authentication, cart, checkout and orders are implemented;
 the [Phase 4 report](phase-4-wishlist-reviews.md) adds wishlist/review boundaries and
 the current validation results. The [Phase 2 report](phase-2-auth-cart.md) and

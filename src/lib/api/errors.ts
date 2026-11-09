@@ -10,11 +10,15 @@ export type ApiErrorCode =
   | "conflict"
   | "import_account_mismatch"
   | "mock_payment_declined"
+  | "admin_resolution_required"
   | "rate_limited"
   | "unavailable"
   | "http";
+// Reviewed admin conflicts convey a manual inventory/tracking resolution requirement.
 
 const messages: Record<ApiErrorCode, string> = {
+  admin_resolution_required:
+    "Cancellation requires manual inventory or tracking review. Refresh the order and contact the store operator; no successful cancellation is confirmed.",
   configuration: "The service connection is not configured correctly.",
   network: "The service could not be reached.",
   timeout: "The service took too long to respond.",

@@ -8,12 +8,14 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useCommerce } from "@/features/cart/components/CommerceProvider";
 import { useWishlist } from "@/features/wishlist/components/WishlistProvider";
+import { useAdminAccess } from "@/features/admin/components/AdminAccessProvider";
 
 export function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const commerce = useCommerce();
   const wishlist = useWishlist();
+  const admin = useAdminAccess();
   const count = commerce.session?.user
     ? (commerce.cart?.items.reduce((sum, item) => sum + item.quantity, 0) ?? 0)
     : commerce.guest.items.reduce((sum, item) => sum + item.quantity, 0);
@@ -47,6 +49,7 @@ export function Header() {
         wishlist.count === null ? "Wishlist" : `Wishlist (${wishlist.count})`,
     },
     ...(commerce.session?.user ? [{ href: "/orders", label: "Orders" }] : []),
+    ...(admin.allowed ? [{ href: "/admin", label: "Manage store" }] : []),
   ];
   return (
     <header className="relative z-20 border-b border-slate-200/80 bg-white">
@@ -64,7 +67,7 @@ export function Header() {
         </Link>
         <nav
           aria-label="Main navigation"
-          className="hidden items-center gap-5 lg:flex"
+          className={`hidden items-center gap-5 ${admin.allowed ? "xl:flex" : "lg:flex"}`}
         >
           {links.map((link) => (
             <Link
@@ -132,7 +135,7 @@ export function Header() {
             ref={menuButton}
             variant="ghost"
             size="icon"
-            className="lg:hidden"
+            className={admin.allowed ? "xl:hidden" : "lg:hidden"}
             aria-label={open ? "Close navigation" : "Open navigation"}
             aria-expanded={open}
             aria-controls="mobile-nav"
@@ -146,7 +149,7 @@ export function Header() {
         id="mobile-nav"
         aria-label="Mobile navigation"
         hidden={!open}
-        className="border-t border-slate-100 px-5 py-4 lg:hidden"
+        className={`border-t border-slate-100 px-5 py-4 ${admin.allowed ? "xl:hidden" : "lg:hidden"}`}
       >
         {links.map((link) => (
           <Link

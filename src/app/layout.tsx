@@ -4,6 +4,7 @@ import { Footer } from "@/components/layout/Footer";
 import { CommerceProvider } from "@/features/cart/components/CommerceProvider";
 import { CommerceNotice } from "@/features/cart/components/CommerceNotice";
 import { WishlistProvider } from "@/features/wishlist/components/WishlistProvider";
+import { AdminAccessProvider } from "@/features/admin/components/AdminAccessProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -28,12 +29,14 @@ export default function RootLayout({
         </a>
         <CommerceProvider>
           <WishlistProvider>
-            <Header />
-            <CommerceNotice />
-            <main id="main-content" className="flex-1" tabIndex={-1}>
-              {children}
-            </main>
-            <Footer />
+            <AdminAccessProvider>
+              <Header />
+              <CommerceNotice />
+              <main id="main-content" className="flex-1" tabIndex={-1}>
+                {children}
+              </main>
+              <Footer />
+            </AdminAccessProvider>
           </WishlistProvider>
         </CommerceProvider>
       </body>

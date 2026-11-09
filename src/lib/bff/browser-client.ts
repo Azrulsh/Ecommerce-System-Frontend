@@ -1,5 +1,6 @@
 import { ApiError, type ApiErrorCode } from "../api/errors";
 import { object, string } from "../validation";
+import { validationFields } from "../api/validation-fields";
 
 export async function browserRequest<T>(
   path: string,
@@ -39,6 +40,7 @@ export async function browserRequest<T>(
         "conflict",
         "import_account_mismatch",
         "mock_payment_declined",
+        "admin_resolution_required",
         "rate_limited",
         "unavailable",
         "http",
@@ -47,15 +49,7 @@ export async function browserRequest<T>(
       const fields = Array.isArray(data.fields)
         ? data.fields.filter(
             (field): field is string =>
-              typeof field === "string" &&
-              [
-                "name",
-                "email",
-                "password",
-                "password_confirmation",
-                "rating",
-                "comment",
-              ].includes(field),
+              typeof field === "string" && validationFields.includes(field),
           )
         : [];
       throw new ApiError(code, response.status, undefined, fields);

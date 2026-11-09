@@ -1,5 +1,6 @@
 import type { ApiConfig } from "./config";
 import { ApiError, httpError } from "./errors";
+import { validationFields } from "./validation-fields";
 
 export interface ApiRequestOptions {
   method?: "GET" | "POST" | "PATCH" | "DELETE";
@@ -94,16 +95,7 @@ export async function requestJson<T>(
           !Array.isArray(data.errors)
         )
           fields = Object.keys(data.errors).filter((key) =>
-            [
-              "name",
-              "email",
-              "password",
-              "password_confirmation",
-              "quantity",
-              "product_id",
-              "rating",
-              "comment",
-            ].includes(key),
+            validationFields.includes(key),
           );
       } catch {
         if (signal.aborted) throw new ApiError("timeout", response.status);

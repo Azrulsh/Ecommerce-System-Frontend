@@ -1,0 +1,29 @@
+import type { NextRequest } from "next/server";
+import { withAdminSession } from "@/features/admin/server/access";
+import { adminApi } from "@/features/admin/server/api";
+import { productInput, productFilters } from "@/features/admin/validation";
+import { endpoint, privateJson } from "@/lib/bff/response";
+import { readJsonObject } from "@/lib/bff/security";
+export const runtime = "nodejs";
+export async function GET(request: NextRequest) {
+  return endpoint(() =>
+    withAdminSession(request, false, async (context) =>
+      privateJson(
+        await adminApi(context.session.token!).products(
+          productFilters(request.nextUrl.searchParams),
+        ),
+      ),
+    ),
+  );
+}
+export async function POST(request: NextRequest) {
+  return endpoint(() =>
+    withAdminSession(request, true, async (context) => {
+      const body = productInput(await readJsonObject(request, 64_000));
+      return privateJson(
+        { data: await adminApi(context.session.token!).createProduct(body) },
+        201,
+      );
+    }),
+  );
+}

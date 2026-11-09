@@ -1,5 +1,8 @@
 # Phase 4: customer wishlist and product reviews
 
+Accepted Phase 4 baseline. Administration is now implemented separately in the
+[Phase 5 report](phase-5-admin-dashboard.md); wishlist and review behavior remains intact.
+
 Implemented on 9 November 2026 against the accepted Phase 1–3 frontend. All changes
 are in `ecommerce-frontend`. Laravel source, configuration, tests and database were
 strictly read-only. No dependencies were added or upgraded; no commits, pushes,

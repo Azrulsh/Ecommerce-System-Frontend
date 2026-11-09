@@ -3,6 +3,7 @@ import { createServer } from "node:http";
 import { randomBytes } from "node:crypto";
 import { purchaseFixture } from "./purchase-api-fixture.mjs";
 import { engagementFixture } from "./engagement-api-fixture.mjs";
+import { adminFixture } from "./admin-api-fixture.mjs";
 
 const password = process.env.FIXTURE_PASSWORD;
 if (!password)
@@ -116,6 +117,11 @@ const engagement = engagementFixture({
   users: () => users,
   body,
 });
+const administration = adminFixture({
+  body,
+  mode: () => mode,
+  orders: () => purchases.state().orders,
+});
 createServer(async (request, response) => {
   const url = new URL(request.url ?? "/", "http://127.0.0.1:8102");
   const send = (status, value) => {
@@ -149,6 +155,7 @@ createServer(async (request, response) => {
         );
       await purchases.reset(input);
       engagement.reset(input);
+      administration.reset(input);
       return send(200, { users });
     }
     if (url.pathname === "/__test/mode" && request.method === "POST") {
@@ -161,6 +168,7 @@ createServer(async (request, response) => {
         tokens: [...tokens.keys()],
         ...purchases.state(),
         ...engagement.state(),
+        ...administration.state(),
       });
     if (url.pathname === "/api/register" && request.method === "POST") {
       const data = await body(request);
@@ -205,6 +213,7 @@ createServer(async (request, response) => {
     const token = request.headers.authorization?.replace(/^Bearer /, "");
     const userId = tokens.get(token);
     if (!userId) return send(401, { message: "Unauthenticated." });
+    if (mode.invalidToken) return send(401, { message: "Unauthenticated." });
     if (url.pathname === "/api/user")
       return send(200, { data: users.find((user) => user.id === userId) });
     if (url.pathname === "/api/logout" && request.method === "POST") {
@@ -213,6 +222,7 @@ createServer(async (request, response) => {
       tokens.delete(token);
       return send(204, null);
     }
+    if (await administration.handle(request, url, userId, send)) return;
     if (await purchases.handle(request, url, userId, send)) return;
     if (await engagement.authenticated(request, url, userId, send)) return;
     if (mode.cartStatus)

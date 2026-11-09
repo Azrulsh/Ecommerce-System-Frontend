@@ -19,7 +19,10 @@ export function verifyCsrf(provided: string | null, expected: string) {
   )
     throw new ApiError("forbidden", 403);
 }
-export async function readJson(request: Request): Promise<unknown> {
+export async function readJson(
+  request: Request,
+  maxBytes = 32_000,
+): Promise<unknown> {
   if (
     request.headers.get("content-type")?.split(";")[0].trim() !==
     "application/json"
@@ -48,7 +51,7 @@ export async function readJson(request: Request): Promise<unknown> {
     });
     if (chunk.done) break;
     length += chunk.value.length;
-    if (length > 32_000) {
+    if (length > maxBytes) {
       await reader.cancel();
       throw new ApiError("validation", 422);
     }
@@ -62,8 +65,9 @@ export async function readJson(request: Request): Promise<unknown> {
 }
 export async function readJsonObject(
   request: Request,
+  maxBytes = 32_000,
 ): Promise<Record<string, unknown>> {
-  const value = await readJson(request);
+  const value = await readJson(request, maxBytes);
   if (!value || typeof value !== "object" || Array.isArray(value))
     throw new ApiError("validation", 422);
   return value as Record<string, unknown>;

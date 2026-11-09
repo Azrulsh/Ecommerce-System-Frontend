@@ -25,9 +25,11 @@ createServer(async (request, response) => {
     return;
   }
   if (
-    /^\/api\/(?:login|register|logout|user|cart(?:\/items(?:\/\d+)?)?|checkout|orders(?:\/\d+(?:\/payment)?)?|wishlist(?:\/items(?:\/\d+)?)?|products\/\d+\/reviews|reviews\/\d+)$/.test(
+    /^\/api\/(?:login|register|logout|user|cart(?:\/items(?:\/\d+)?)?|checkout|orders(?:\/\d+(?:\/payment)?)?|wishlist(?:\/items(?:\/\d+)?)?|products\/\d+\/reviews|reviews\/\d+|admin\/(?:categories(?:\/\d+)?|discounts(?:\/\d+(?:\/products(?:\/\d+)?)?)?|orders(?:\/\d+(?:\/status)?)?|sales-summary))$/.test(
       url.pathname,
-    )
+    ) ||
+    (request.headers.authorization &&
+      /^\/api\/(?:products(?:\/\d+)?|categories)$/.test(url.pathname))
   ) {
     // Authentication/cart writes are redirected ONLY to the isolated fixture.
     try {

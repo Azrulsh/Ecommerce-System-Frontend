@@ -1,10 +1,10 @@
 # Everyday storefront
 
-A Next.js storefront for the independent Laravel e-commerce API. Phase 4 adds account wishlists and public product reviews, including customer submission, editing and deletion, to the accepted authentication, cart, checkout and order foundation. The teal storefront is preserved. Administration and real payment processing remain outside this implementation.
+A Next.js storefront for the independent Laravel e-commerce API. Phase 5 adds verified administrator access, sales reporting, product/category management, stock updates, discounts and order management to the accepted customer storefront. The teal design is preserved. Real payment processing and customer/role administration remain outside the supported API.
 
 ## Stack and setup
 
-Next.js 16.4.5 App Router, React 19.3, strict TypeScript, Tailwind CSS 4, locally owned shadcn/ui primitives, Lucide React, native Fetch and Playwright. No dependencies were added for Phases 2–4. Consult the installed Next.js documentation before framework changes.
+Next.js 16.4.5 App Router, React 19.3, strict TypeScript, Tailwind CSS 4, locally owned shadcn/ui primitives, Lucide React, native Fetch and Playwright. No dependencies were added for Phases 2–5. Consult the installed Next.js documentation before framework changes.
 
 Requirements: Node.js 20.9+ (verified with 24.22.2), npm and the separately managed Laravel API. Run commands only in `ecommerce-frontend`:
 
@@ -27,19 +27,25 @@ Open that exact origin; `localhost` and `127.0.0.1` are different origins. Resta
 
 ## Implemented behavior
 
-| Route                       | Behavior                                                                                |
-| --------------------------- | --------------------------------------------------------------------------------------- |
-| `/`, `/products`            | Catalog, category navigation, search, sorting, pagination and add-to-cart               |
-| `/products/[id]`            | Product, stock, Laravel pricing, wishlist controls and paginated public reviews         |
-| `/wishlist`                 | Protected saved products, count, pagination, removal and existing cart controls         |
-| `/login`, `/register`       | Validated customer credentials, session rotation and safe internal return destinations  |
-| `/account`                  | Server-verified public customer identity and sign-out                                   |
-| `/cart`                     | Guest quantities and estimates, account cart, explicit guest import review and recovery |
-| `/checkout`                 | Authenticated current-cart review, demo consent and safe order placement/recovery       |
-| `/orders`                   | Owner-scoped newest-first order history, 10 records per page                            |
-| `/orders/[id]`              | Historical purchase snapshots, authoritative order/payment/refund status                |
-| `/orders/[id]/confirmation` | Read-only order confirmation; refresh never resubmits checkout                          |
-| `/orders/[id]/payment`      | Read-only simulated payment status and refresh                                          |
+| Route                                                               | Behavior                                                                                            |
+| ------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `/`, `/products`                                                    | Catalog, category navigation, search, sorting, pagination and add-to-cart                           |
+| `/products/[id]`                                                    | Product, stock, Laravel pricing, wishlist controls and paginated public reviews                     |
+| `/wishlist`                                                         | Protected saved products, count, pagination, removal and existing cart controls                     |
+| `/login`, `/register`                                               | Validated customer credentials, session rotation and safe internal return destinations              |
+| `/account`                                                          | Server-verified public customer identity and sign-out                                               |
+| `/cart`                                                             | Guest quantities and estimates, account cart, explicit guest import review and recovery             |
+| `/checkout`                                                         | Authenticated current-cart review, demo consent and safe order placement/recovery                   |
+| `/orders`                                                           | Owner-scoped newest-first order history, 10 records per page                                        |
+| `/orders/[id]`                                                      | Historical purchase snapshots, authoritative order/payment/refund status                            |
+| `/orders/[id]/confirmation`                                         | Read-only order confirmation; refresh never resubmits checkout                                      |
+| `/orders/[id]/payment`                                              | Read-only simulated payment status and refresh                                                      |
+| `/admin`                                                            | Verified administrator dashboard and UTC-filtered sales reports                                     |
+| `/admin/products`                                                   | Active catalog, name/category/price filters, sorting, pagination and product editing                |
+| `/admin/products/new`, `/admin/products/[id]`                       | Product creation, metadata changes, explicit stock updates, soft deletion and known-ID reactivation |
+| `/admin/categories`                                                 | Paginated category creation, editing and deletion when unreferenced                                 |
+| `/admin/discounts`, `/admin/discounts/new`, `/admin/discounts/[id]` | Discount strategies, UTC schedules, loyalty settings, assignments and deactivation                  |
+| `/admin/orders`, `/admin/orders/[id]`                               | All authorized order snapshots, filtering and backend-validated status/cancellation actions         |
 
 Guests can add, update and remove products without login. Storage contains only product IDs, quantities and an optional frozen import ID/snapshot. Account carts, prices, discounts and stock remain owned by Laravel. Guest totals are explicitly estimates from current public API prices; no discounts are calculated in Next.js. Adding products does not reserve inventory.
 
@@ -66,12 +72,17 @@ src/features/checkout/    Durable checkout workflow, review/consent and API adap
 src/features/orders/      Order/payment contracts, owner-scoped adapters and UI
 src/features/wishlist/    Laravel wishlist adapter, session-scoped provider and UI
 src/features/reviews/     Public review query, customer mutations, validation and UI
+src/features/admin/       Capability verification, privileged adapters, workflows and management UI
 src/lib/api/              Guarded server transport, configuration and safe errors
 src/lib/bff/              Encrypted file store, locks, CSRF, cookies and responses
 src/components/           Shared layout and presentation primitives
 ```
 
 Browser -> opaque HttpOnly cookie -> Next.js BFF -> server-held Sanctum bearer token -> Laravel. The backend uses bearer authentication, with Sanctum SPA cookie authentication disabled. No Laravel cookie/CSRF/CORS flow is assumed. Browser mutations require exact origin verification, SameSite cookies and a session CSRF token. API responses are private and uncached. Backend authorization remains authoritative.
+
+Laravel omits admin role from its user resource. The BFF verifies capability through a validated read of `admin/categories?per_page=1&page=1`, protected by `EnsureAdmin`; every privileged BFF operation rechecks it and retains the target endpoint's own authorization. Customer authentication, token abilities, email and browser role flags never establish admin permission. Admin pages also verify access on the server; navigation/data are scoped to the current verified session and hidden during revalidation. No account is created or promoted by this implementation.
+
+Admin product reads are **active-only** because there is no full admin inventory endpoint. Known inactive IDs can be reactivated through the supported product patch; deleted products have no restore action. Stock edits explicitly replace the absolute count and have no backend revision protection. Category deletion refuses any product references, including soft-deleted products. Discount deletion deactivates while retaining assignments. Order cancellation uses Laravel's transaction for stock restoration and mock refunds; uncertain results require reading the order before another action. See the [Phase 5 report](docs/phase-5-admin-dashboard.md) for these constraints, exact contracts and recovery.
 
 The persistent store supports **one Node host with durable private local disk**. Multiple processes on that host share exclusive file locks; serverless and multiple hosts are unsupported. Production requires all of:
 
@@ -102,14 +113,15 @@ npm.cmd audit
 
 `test:unit` is independent of Laravel and browsers. `npm.cmd test` uses the existing production build, installed Microsoft Edge and an existing populated catalog at `TEST_API_BASE_URL` (default `http://127.0.0.1:8000/api`). `test:e2e` runs browser/BFF integration checks only. Focus with `npm.cmd test -- --grep "test name"`.
 
-Tests reserve ports 3100, 8101 and 8102, refuse occupied ports and stop only processes they launch. **All authentication, cart, checkout, payment, order, wishlist and review traffic goes to isolated test-only Node fixtures**, with credentials and keys generated per run. Only public catalog GETs reach the actual Laravel API. Wishlist/review fixtures reuse a validated public catalog snapshot. Their pagination test requires at least 13 existing catalog products. No backend database fixtures are created. Local expiry/recovery tests alter only their own encrypted temporary frontend records. This isolation is essential because even Laravel `GET /cart` can create database records.
+Tests reserve ports 3100, 8101 and 8102, refuse occupied ports and stop only processes they launch. **All authentication, cart, checkout, payment, order, wishlist, review and admin traffic goes to isolated test-only Node fixtures**, with credentials and keys generated per run. Admin product reads/writes also stop at the fixture. Only public catalog GETs reach the actual Laravel API. Wishlist/review/admin fixtures reuse a validated public catalog snapshot; pagination requires at least 13 existing products. Synthetic admin permissions exist only in fixture memory. No backend users are created/promoted and no database fixtures are created. Local expiry/recovery tests alter only their owned encrypted temporary frontend records. This isolation is essential because even Laravel `GET /cart` can create database records.
 
-The suite has 59 unit/transport checks and 66 browser/BFF integration checks, 125 total. All 89 Phase 1–3 checks remain. Phase 4 adds wishlist persistence/isolation/concurrency, late-response rejection, safe login return without replay, review ownership/validation/pagination/aggregates, uncertain writes, real request timeout, escaped text, session expiry and responsive layouts. Authenticated live-Laravel acceptance testing remains a separate task for an authorized disposable environment.
+The suite has 74 unit/transport checks and 96 browser/BFF integration checks, 170 total. All 125 Phase 1–4 tests remain. Phase 5 adds role/access checks, privileged CRUD and validation, absolute stock changes, reporting, cancellation/refund rollback, uncertainty, stale responses, session/account isolation and responsive admin UI. Authenticated live-Laravel acceptance testing remains a separate task for an explicitly authorized disposable environment.
 
 The audit reports zero production vulnerabilities and eight existing moderate findings in the development lint chain. No forced downgrade, audit fix or dependency upgrade was applied.
 
 ## Documentation and next work
 
+- [Phase 5 admin implementation, authorization, contracts, file manifest and manual acceptance](docs/phase-5-admin-dashboard.md)
 - [Phase 4 wishlist/review implementation, verified eligibility, file manifest and manual checks](docs/phase-4-wishlist-reviews.md)
 - [Phase 3 checkout/order implementation, idempotency, contracts, file manifest, validation and manual checks](docs/phase-3-checkout-orders.md)
 - [Accepted Phase 2 authentication and cart foundation](docs/phase-2-auth-cart.md)
@@ -118,4 +130,4 @@ The audit reports zero production vulnerabilities and eight existing moderate fi
 - [Historical authentication decision](docs/authentication-strategy.md)
 - [Phase 1 delivery report](docs/phase-1-report.md)
 
-Before release, verify HTTPS cookies, private storage ACLs/durability, proxy rate limits, CSP/HSTS, backup/restore and operational recovery. Cart import remains non-atomic; checkout idempotency relies on Laravel's customer-scoped key and the durable frontend checkpoint. There is no cart revision/quote lock or order lookup by idempotency key. Phase 5 should prioritize disposable-environment acceptance, deployment hardening and accessibility/performance validation. Administrative capability discovery and real payment processing need separately approved contracts and scope. No backend changes, commits, pushes, merges or releases are performed by this work.
+Before release, verify HTTPS cookies, private storage ACLs/durability, proxy rate limits, CSP/HSTS, backup/restore and operational recovery. Cart import remains non-atomic; checkout idempotency relies on Laravel's customer-scoped key and the durable frontend checkpoint. There is no cart revision/quote lock or order lookup by idempotency key. Phase 6 should prioritize disposable-environment acceptance, deployment hardening, admin abuse controls and accessibility/performance validation. Full inactive inventory, stock revisions, customer/role management and real payments require separately approved backend capabilities. No backend changes, commits, pushes, merges or releases are performed by this work.

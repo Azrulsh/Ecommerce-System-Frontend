@@ -1,5 +1,10 @@
 # Sanctum integration decision for a future phase
 
+Phase 5 now establishes admin capability through the protected category-read probe
+described in the [admin report](phase-5-admin-dashboard.md). It does not invent a
+role field or change authentication. The omitted-role concern below remains a
+backend contract limitation, with a verified server-side workaround.
+
 Historical Phase 1 decision. The selected BFF approach is now implemented; see
 the [Phase 2 implementation report](phase-2-auth-cart.md). The assessment below
 records the original rationale and is not the current feature inventory.

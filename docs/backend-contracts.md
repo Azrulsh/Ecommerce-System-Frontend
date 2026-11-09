@@ -110,7 +110,7 @@ bulk save, review revision/conditional write or review idempotency endpoint.
 
 ## Administration
 
-Admin routes require both authentication and backend admin permission. `UserResource` omits that permission, which is a future capability-discovery limitation.
+Admin routes require both authentication and backend admin permission. `UserResource` omits that permission. Phase 5 verifies it through a validated server-held-token read of `GET /admin/categories?per_page=1&page=1`, guarded by `EnsureAdmin`, and repeats that check for every privileged BFF operation. See the [Phase 5 report](phase-5-admin-dashboard.md); no browser flag, wildcard ability or authenticated-customer assumption grants admin access.
 
 | Endpoint group                                                                  | Capability and constraints                                                                                                                                                    |
 | ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -120,12 +120,12 @@ Admin routes require both authentication and backend admin permission. `UserReso
 | `POST /admin/discounts/{discount}/products`                                     | Explicit product ID assignment                                                                                                                                                |
 | `DELETE /admin/discounts/{discount}/products/{productId}`                       | Remove assignment; 204                                                                                                                                                        |
 | `GET /admin/orders`, `GET /admin/orders/{order}`                                | Admin order resources; filter status and `from_date`/`to_date` (`Y-m-d`), plus pagination                                                                                     |
-| `PATCH /admin/orders/{order}`                                                   | Backend-enforced status workflow; simulation header only in permitted local/testing cancellation scenarios                                                                    |
+| `PATCH /admin/orders/{order}/status`                                            | Backend-enforced status workflow and cancellation transaction; the frontend never forwards refund simulation headers                                                          |
 | `GET /admin/sales-summary`                                                      | Date-filtered counts, `orders_by_status`, `gross_sales`, `discounts_given`, `net_sales`, `top_selling_products`                                                               |
 
 `OrderStatus` supports placed → processing/cancelled, processing → shipped/cancelled, shipped → completed; completed/cancelled are terminal. Do not implement a frontend state transition as authoritative. Mock refunds/restocking on eligible cancellation are backend responsibilities. Dates in sales reporting use UTC boundaries. The admin route group is rate-limited to 60/minute/user, in addition to the API limiter.
 
-Sources: admin controllers, resources, requests, `EnsureAdmin`, `ProductPolicy`, `OrderStatus`, `OrderWorkflowService`, `SalesSummaryService` and admin tests. Future validators should be written from these exact contracts at implementation time; this phase does not add unused TypeScript models for them.
+Sources: admin controllers, resources, requests, `EnsureAdmin`, `ProductPolicy`, `OrderStatus`, `OrderWorkflowService`, `SalesSummaryService` and admin tests. Product reads remain active-only even for admins; product deletion is soft deletion. Categories with any product reference cannot be deleted. There is no customer/role CRUD, full inactive product list, stock revision, inventory history or standalone refund endpoint. `OrderResource` exposes no customer contact fields. Phase 5 adds feature validators without changing Laravel or executing backend tests.
 
 ## Assessment verification boundary
 
