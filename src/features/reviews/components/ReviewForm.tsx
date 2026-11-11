@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ApiError } from "@/lib/api/errors";
 import { reviewInput } from "../validation";
@@ -19,6 +19,10 @@ export function ReviewForm({
   const active = useRef(false);
   const [error, setError] = useState("");
   const [blocked, setBlocked] = useState(false);
+  const errorSummary = useRef<HTMLParagraphElement>(null);
+  useEffect(() => {
+    if (error) errorSummary.current?.focus();
+  }, [error]);
   const id = review ? `review-${review.id}` : "new-review";
   return (
     <form
@@ -80,6 +84,7 @@ export function ReviewForm({
           value={rating}
           onChange={(event) => setRating(Number(event.target.value))}
           required
+          aria-describedby={error ? `${id}-error` : undefined}
           disabled={busy || blocked}
           className="min-h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm"
         >
@@ -106,7 +111,7 @@ export function ReviewForm({
           onChange={(event) => setComment(event.target.value)}
           rows={4}
           disabled={busy || blocked}
-          aria-describedby={`${id}-help`}
+          aria-describedby={`${id}-help${error ? ` ${id}-error` : ""}`}
           className="w-full rounded-lg border border-slate-300 bg-white p-3 text-sm focus-visible:outline-teal-700"
         />
         <p id={`${id}-help`} className="mt-1 text-xs text-slate-500">
@@ -115,7 +120,13 @@ export function ReviewForm({
         </p>
       </div>
       {error && (
-        <p role="alert" className="text-sm leading-6 text-rose-800">
+        <p
+          id={`${id}-error`}
+          ref={errorSummary}
+          tabIndex={-1}
+          role="alert"
+          className="text-sm leading-6 text-rose-800"
+        >
           {error}
         </p>
       )}

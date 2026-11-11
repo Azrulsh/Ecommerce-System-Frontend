@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useCommerce } from "@/features/cart/components/CommerceProvider";
 import { ApiError } from "@/lib/api/errors";
@@ -21,6 +21,10 @@ export function AuthForm({
   const [message, setMessage] = useState("");
   const [fields, setFields] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
+  const errorSummary = useRef<HTMLParagraphElement>(null);
+  useEffect(() => {
+    if (message) errorSummary.current?.focus();
+  }, [message]);
   const next = safeReturnTo(returnTo);
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -131,6 +135,8 @@ export function AuthForm({
           {message && (
             <p
               id="auth-message"
+              ref={errorSummary}
+              tabIndex={-1}
               role="alert"
               className="rounded-lg bg-rose-50 p-3 text-sm leading-6 text-rose-800"
             >

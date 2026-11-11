@@ -267,7 +267,7 @@ function ProductWorkspace({
         <div className="mt-7 space-y-6">
           <section className="rounded-2xl border border-teal-100 bg-teal-50 p-5">
             <h2 className="font-semibold">Confirmed product snapshot</h2>
-            <p className="mt-3 text-sm">
+            <p className="mt-3 break-words text-sm">
               {product.name} · {formatMoney(product.price)} ·{" "}
               {product.is_active ? "Active" : "Inactive"} · Stock{" "}
               {product.stock_quantity}

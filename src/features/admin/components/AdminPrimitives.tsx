@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { CustomerError } from "@/components/ui/customer-feedback";
 import type { ApiError } from "@/lib/api/errors";
@@ -36,10 +37,16 @@ export function MutationFeedback({
 }: {
   mutation: ReturnType<typeof useAdminMutation>;
 }) {
+  const errorSummary = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (mutation.error) errorSummary.current?.focus();
+  }, [mutation.error]);
   return (
     <>
       {mutation.error && (
         <div
+          ref={errorSummary}
+          tabIndex={-1}
           role="alert"
           className="my-4 rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm leading-6 text-rose-950"
         >

@@ -1,0 +1,879 @@
+{
+  "environment": {
+    "node": "v24.22.2",
+    "browser": "156.0.4314.58",
+    "os": "Windows_NT 10.0.26300 x64",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "mode": "local production build, Edge, isolated private fixtures, live public Laravel GETs, one sample per route, shared browser cache"
+  },
+  "rows": [
+    {
+      "route": "/",
+      "contrast": {
+        "flatTextSamples": 46,
+        "minimumRatio": 4.55,
+        "failures": []
+      },
+      "ttfbMs": 63,
+      "documentResponseEndMs": 1276,
+      "domInteractiveMs": 9520,
+      "domContentLoadedMs": 9520,
+      "documentBytes": 79721,
+      "scriptFiles": 11,
+      "scriptDecodedBytes": 535940,
+      "scriptTransferredBytes": 166142,
+      "slowestResources": [
+        {
+          "origin": "http://me.kis.v2.scr.kaspersky-labs.com",
+          "path": "/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js",
+          "type": "script",
+          "durationMs": 9189
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/_next/static/chunks/0w2d3fi319gvl.js",
+          "type": "script",
+          "durationMs": 197
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/_next/static/chunks/0tnulw8z80jnc.js",
+          "type": "script",
+          "durationMs": 188
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/_next/static/chunks/39rrbn33oe68d.js",
+          "type": "script",
+          "durationMs": 178
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/_next/static/chunks/1vs24ki1v3vmn.js",
+          "type": "script",
+          "durationMs": 164
+        }
+      ],
+      "browserRequests": 25,
+      "bffRequests": ["/api/session"]
+    },
+    {
+      "route": "/products",
+      "contrast": {
+        "flatTextSamples": 60,
+        "minimumRatio": 4.55,
+        "failures": []
+      },
+      "ttfbMs": 32,
+      "documentResponseEndMs": 1212,
+      "domInteractiveMs": 1222,
+      "domContentLoadedMs": 1222,
+      "documentBytes": 139706,
+      "scriptFiles": 11,
+      "scriptDecodedBytes": 535940,
+      "scriptTransferredBytes": 0,
+      "slowestResources": [
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/",
+          "type": "fetch",
+          "durationMs": 36
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/wishlist",
+          "type": "fetch",
+          "durationMs": 33
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/wishlist",
+          "type": "fetch",
+          "durationMs": 27
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/",
+          "type": "fetch",
+          "durationMs": 26
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/api/session",
+          "type": "fetch",
+          "durationMs": 21
+        }
+      ],
+      "browserRequests": 19,
+      "bffRequests": ["/api/session"]
+    },
+    {
+      "route": "/products/21",
+      "contrast": {
+        "flatTextSamples": 37,
+        "minimumRatio": 4.55,
+        "failures": []
+      },
+      "ttfbMs": 46,
+      "documentResponseEndMs": 1294,
+      "domInteractiveMs": 1310,
+      "domContentLoadedMs": 1310,
+      "documentBytes": 50365,
+      "scriptFiles": 11,
+      "scriptDecodedBytes": 547211,
+      "scriptTransferredBytes": 5405,
+      "slowestResources": [
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/api/session",
+          "type": "fetch",
+          "durationMs": 84
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/wishlist",
+          "type": "fetch",
+          "durationMs": 52
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/products",
+          "type": "fetch",
+          "durationMs": 51
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/",
+          "type": "fetch",
+          "durationMs": 50
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/wishlist",
+          "type": "fetch",
+          "durationMs": 44
+        }
+      ],
+      "browserRequests": 23,
+      "bffRequests": ["/api/session", "/api/products/21/reviews"]
+    },
+    {
+      "route": "/login",
+      "contrast": {
+        "flatTextSamples": 19,
+        "minimumRatio": 4.76,
+        "failures": []
+      },
+      "ttfbMs": 32,
+      "documentResponseEndMs": 33,
+      "domInteractiveMs": 100,
+      "domContentLoadedMs": 100,
+      "documentBytes": 22392,
+      "scriptFiles": 11,
+      "scriptDecodedBytes": 536745,
+      "scriptTransferredBytes": 2141,
+      "slowestResources": [
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/api/session",
+          "type": "fetch",
+          "durationMs": 83
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/wishlist",
+          "type": "fetch",
+          "durationMs": 54
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/products",
+          "type": "fetch",
+          "durationMs": 53
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/",
+          "type": "fetch",
+          "durationMs": 53
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/products",
+          "type": "fetch",
+          "durationMs": 46
+        }
+      ],
+      "browserRequests": 24,
+      "bffRequests": ["/api/session"]
+    },
+    {
+      "route": "/register",
+      "contrast": {
+        "flatTextSamples": 22,
+        "minimumRatio": 4.76,
+        "failures": []
+      },
+      "ttfbMs": 20,
+      "documentResponseEndMs": 21,
+      "domInteractiveMs": 99,
+      "domContentLoadedMs": 99,
+      "documentBytes": 23030,
+      "scriptFiles": 11,
+      "scriptDecodedBytes": 536745,
+      "scriptTransferredBytes": 0,
+      "slowestResources": [
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/api/session",
+          "type": "fetch",
+          "durationMs": 63
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/wishlist",
+          "type": "fetch",
+          "durationMs": 44
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/products",
+          "type": "fetch",
+          "durationMs": 43
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/",
+          "type": "fetch",
+          "durationMs": 42
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/",
+          "type": "fetch",
+          "durationMs": 41
+        }
+      ],
+      "browserRequests": 24,
+      "bffRequests": ["/api/session"]
+    },
+    {
+      "route": "/cart",
+      "contrast": {
+        "flatTextSamples": 32,
+        "minimumRatio": 4.55,
+        "failures": []
+      },
+      "ttfbMs": 32,
+      "documentResponseEndMs": 33,
+      "domInteractiveMs": 108,
+      "domContentLoadedMs": 109,
+      "documentBytes": 21463,
+      "scriptFiles": 12,
+      "scriptDecodedBytes": 546710,
+      "scriptTransferredBytes": 5471,
+      "slowestResources": [
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/api/wishlist",
+          "type": "fetch",
+          "durationMs": 90
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/api/admin/access",
+          "type": "fetch",
+          "durationMs": 59
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/api/cart",
+          "type": "fetch",
+          "durationMs": 56
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/products",
+          "type": "fetch",
+          "durationMs": 51
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/api/session",
+          "type": "fetch",
+          "durationMs": 50
+        }
+      ],
+      "browserRequests": 29,
+      "bffRequests": [
+        "/api/session",
+        "/api/cart",
+        "/api/admin/access",
+        "/api/wishlist"
+      ]
+    },
+    {
+      "route": "/checkout",
+      "contrast": {
+        "flatTextSamples": 29,
+        "minimumRatio": 4.76,
+        "failures": []
+      },
+      "ttfbMs": 32,
+      "documentResponseEndMs": 40,
+      "domInteractiveMs": 91,
+      "domContentLoadedMs": 91,
+      "documentBytes": 24707,
+      "scriptFiles": 13,
+      "scriptDecodedBytes": 548202,
+      "scriptTransferredBytes": 6149,
+      "slowestResources": [
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/api/wishlist",
+          "type": "fetch",
+          "durationMs": 135
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/api/admin/access",
+          "type": "fetch",
+          "durationMs": 99
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/api/session",
+          "type": "fetch",
+          "durationMs": 54
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/api/cart",
+          "type": "fetch",
+          "durationMs": 42
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/api/checkout",
+          "type": "fetch",
+          "durationMs": 39
+        }
+      ],
+      "browserRequests": 31,
+      "bffRequests": [
+        "/api/session",
+        "/api/cart",
+        "/api/checkout",
+        "/api/admin/access",
+        "/api/wishlist"
+      ]
+    },
+    {
+      "route": "/orders",
+      "contrast": {
+        "flatTextSamples": 27,
+        "minimumRatio": 4.55,
+        "failures": []
+      },
+      "ttfbMs": 28,
+      "documentResponseEndMs": 39,
+      "domInteractiveMs": 92,
+      "domContentLoadedMs": 92,
+      "documentBytes": 24739,
+      "scriptFiles": 12,
+      "scriptDecodedBytes": 539179,
+      "scriptTransferredBytes": 2367,
+      "slowestResources": [
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/api/wishlist",
+          "type": "fetch",
+          "durationMs": 146
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/api/orders",
+          "type": "fetch",
+          "durationMs": 85
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/api/cart",
+          "type": "fetch",
+          "durationMs": 78
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/products",
+          "type": "fetch",
+          "durationMs": 77
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/",
+          "type": "fetch",
+          "durationMs": 75
+        }
+      ],
+      "browserRequests": 30,
+      "bffRequests": [
+        "/api/session",
+        "/api/cart",
+        "/api/orders",
+        "/api/admin/access",
+        "/api/wishlist"
+      ]
+    },
+    {
+      "route": "/orders/1",
+      "contrast": {
+        "flatTextSamples": 45,
+        "minimumRatio": 4.55,
+        "failures": []
+      },
+      "ttfbMs": 24,
+      "documentResponseEndMs": 34,
+      "domInteractiveMs": 84,
+      "domContentLoadedMs": 84,
+      "documentBytes": 25275,
+      "scriptFiles": 12,
+      "scriptDecodedBytes": 542608,
+      "scriptTransferredBytes": 3094,
+      "slowestResources": [
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/api/wishlist",
+          "type": "fetch",
+          "durationMs": 123
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/api/admin/access",
+          "type": "fetch",
+          "durationMs": 79
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/api/cart",
+          "type": "fetch",
+          "durationMs": 62
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/products",
+          "type": "fetch",
+          "durationMs": 61
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/",
+          "type": "fetch",
+          "durationMs": 50
+        }
+      ],
+      "browserRequests": 28,
+      "bffRequests": [
+        "/api/session",
+        "/api/cart",
+        "/api/orders/1",
+        "/api/admin/access",
+        "/api/wishlist"
+      ]
+    },
+    {
+      "route": "/wishlist",
+      "contrast": {
+        "flatTextSamples": 18,
+        "minimumRatio": 4.55,
+        "failures": []
+      },
+      "ttfbMs": 35,
+      "documentResponseEndMs": 46,
+      "domInteractiveMs": 98,
+      "domContentLoadedMs": 99,
+      "documentBytes": 25776,
+      "scriptFiles": 12,
+      "scriptDecodedBytes": 542527,
+      "scriptTransferredBytes": 3627,
+      "slowestResources": [
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/api/wishlist",
+          "type": "fetch",
+          "durationMs": 118
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/api/admin/access",
+          "type": "fetch",
+          "durationMs": 74
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/api/session",
+          "type": "fetch",
+          "durationMs": 32
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/products",
+          "type": "fetch",
+          "durationMs": 31
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/",
+          "type": "fetch",
+          "durationMs": 30
+        }
+      ],
+      "browserRequests": 26,
+      "bffRequests": [
+        "/api/session",
+        "/api/cart",
+        "/api/wishlist",
+        "/api/admin/access",
+        "/api/wishlist"
+      ]
+    },
+    {
+      "route": "/admin",
+      "contrast": {
+        "flatTextSamples": 53,
+        "minimumRatio": 4.55,
+        "failures": []
+      },
+      "ttfbMs": 36,
+      "documentResponseEndMs": 68,
+      "domInteractiveMs": 98,
+      "domContentLoadedMs": 98,
+      "documentBytes": 23635,
+      "scriptFiles": 14,
+      "scriptDecodedBytes": 548670,
+      "scriptTransferredBytes": 6570,
+      "slowestResources": [
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/api/admin/summary",
+          "type": "fetch",
+          "durationMs": 108
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/api/wishlist",
+          "type": "fetch",
+          "durationMs": 70
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/api/cart",
+          "type": "fetch",
+          "durationMs": 56
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/products",
+          "type": "fetch",
+          "durationMs": 55
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/",
+          "type": "fetch",
+          "durationMs": 45
+        }
+      ],
+      "browserRequests": 32,
+      "bffRequests": [
+        "/api/session",
+        "/api/cart",
+        "/api/admin/access",
+        "/api/wishlist",
+        "/api/admin/summary"
+      ]
+    },
+    {
+      "route": "/admin/products",
+      "contrast": {
+        "flatTextSamples": 60,
+        "minimumRatio": 4.55,
+        "failures": []
+      },
+      "ttfbMs": 27,
+      "documentResponseEndMs": 38,
+      "domInteractiveMs": 84,
+      "domContentLoadedMs": 84,
+      "documentBytes": 24238,
+      "scriptFiles": 14,
+      "scriptDecodedBytes": 548833,
+      "scriptTransferredBytes": 4019,
+      "slowestResources": [
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/api/wishlist",
+          "type": "fetch",
+          "durationMs": 119
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/api/admin/products",
+          "type": "fetch",
+          "durationMs": 107
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/api/cart",
+          "type": "fetch",
+          "durationMs": 55
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/products",
+          "type": "fetch",
+          "durationMs": 53
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/",
+          "type": "fetch",
+          "durationMs": 42
+        }
+      ],
+      "browserRequests": 40,
+      "bffRequests": [
+        "/api/session",
+        "/api/cart",
+        "/api/admin/access",
+        "/api/wishlist",
+        "/api/admin/products"
+      ]
+    },
+    {
+      "route": "/admin/products/new",
+      "contrast": {
+        "flatTextSamples": 32,
+        "minimumRatio": 4.55,
+        "failures": []
+      },
+      "ttfbMs": 28,
+      "documentResponseEndMs": 41,
+      "domInteractiveMs": 104,
+      "domContentLoadedMs": 105,
+      "documentBytes": 24663,
+      "scriptFiles": 14,
+      "scriptDecodedBytes": 553846,
+      "scriptTransferredBytes": 5761,
+      "slowestResources": [
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/api/admin/product-options",
+          "type": "fetch",
+          "durationMs": 101
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/api/wishlist",
+          "type": "fetch",
+          "durationMs": 75
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/api/cart",
+          "type": "fetch",
+          "durationMs": 58
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/products",
+          "type": "fetch",
+          "durationMs": 57
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/",
+          "type": "fetch",
+          "durationMs": 49
+        }
+      ],
+      "browserRequests": 34,
+      "bffRequests": [
+        "/api/session",
+        "/api/cart",
+        "/api/admin/access",
+        "/api/wishlist",
+        "/api/admin/product-options"
+      ]
+    },
+    {
+      "route": "/admin/categories",
+      "contrast": {
+        "flatTextSamples": 38,
+        "minimumRatio": 4.55,
+        "failures": []
+      },
+      "ttfbMs": 26,
+      "documentResponseEndMs": 41,
+      "domInteractiveMs": 82,
+      "domContentLoadedMs": 83,
+      "documentBytes": 24195,
+      "scriptFiles": 14,
+      "scriptDecodedBytes": 550294,
+      "scriptTransferredBytes": 4746,
+      "slowestResources": [
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/api/admin/categories",
+          "type": "fetch",
+          "durationMs": 89
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/api/wishlist",
+          "type": "fetch",
+          "durationMs": 86
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/api/cart",
+          "type": "fetch",
+          "durationMs": 55
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/products",
+          "type": "fetch",
+          "durationMs": 53
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/",
+          "type": "fetch",
+          "durationMs": 43
+        }
+      ],
+      "browserRequests": 34,
+      "bffRequests": [
+        "/api/session",
+        "/api/cart",
+        "/api/admin/access",
+        "/api/wishlist",
+        "/api/admin/categories"
+      ]
+    },
+    {
+      "route": "/admin/discounts",
+      "contrast": {
+        "flatTextSamples": 26,
+        "minimumRatio": 4.55,
+        "failures": []
+      },
+      "ttfbMs": 24,
+      "documentResponseEndMs": 35,
+      "domInteractiveMs": 79,
+      "domContentLoadedMs": 79,
+      "documentBytes": 24193,
+      "scriptFiles": 14,
+      "scriptDecodedBytes": 545633,
+      "scriptTransferredBytes": 3162,
+      "slowestResources": [
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/api/admin/discounts",
+          "type": "fetch",
+          "durationMs": 102
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/api/wishlist",
+          "type": "fetch",
+          "durationMs": 85
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/products",
+          "type": "fetch",
+          "durationMs": 67
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/api/cart",
+          "type": "fetch",
+          "durationMs": 53
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/api/session",
+          "type": "fetch",
+          "durationMs": 52
+        }
+      ],
+      "browserRequests": 36,
+      "bffRequests": [
+        "/api/session",
+        "/api/cart",
+        "/api/admin/access",
+        "/api/wishlist",
+        "/api/admin/discounts"
+      ]
+    },
+    {
+      "route": "/admin/orders",
+      "contrast": {
+        "flatTextSamples": 34,
+        "minimumRatio": 4.55,
+        "failures": []
+      },
+      "ttfbMs": 28,
+      "documentResponseEndMs": 39,
+      "domInteractiveMs": 100,
+      "domContentLoadedMs": 103,
+      "documentBytes": 24189,
+      "scriptFiles": 14,
+      "scriptDecodedBytes": 548978,
+      "scriptTransferredBytes": 4104,
+      "slowestResources": [
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/api/admin/orders",
+          "type": "fetch",
+          "durationMs": 86
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/api/wishlist",
+          "type": "fetch",
+          "durationMs": 65
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/api/cart",
+          "type": "fetch",
+          "durationMs": 53
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/products",
+          "type": "fetch",
+          "durationMs": 39
+        },
+        {
+          "origin": "http://127.0.0.1:3100",
+          "path": "/",
+          "type": "fetch",
+          "durationMs": 38
+        }
+      ],
+      "browserRequests": 38,
+      "bffRequests": [
+        "/api/session",
+        "/api/cart",
+        "/api/admin/access",
+        "/api/wishlist",
+        "/api/admin/orders"
+      ]
+    }
+  ]
+}

@@ -37,6 +37,7 @@ export function resolveBffConfig(
     if (
       production &&
       (!env.SESSION_STORE_DIRECTORY ||
+        !path.isAbsolute(env.SESSION_STORE_DIRECTORY) ||
         !env.SESSION_ENCRYPTION_KEY ||
         env.SESSION_DEPLOYMENT !== "single-host")
     )

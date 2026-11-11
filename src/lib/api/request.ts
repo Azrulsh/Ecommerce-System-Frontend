@@ -1,6 +1,7 @@
 import type { ApiConfig } from "./config";
 import { ApiError, httpError } from "./errors";
 import { validationFields } from "./validation-fields";
+import { readResponseJson } from "./response-body";
 
 export interface ApiRequestOptions {
   method?: "GET" | "POST" | "PATCH" | "DELETE";
@@ -84,7 +85,7 @@ export async function requestJson<T>(
     if (response.status === 422 || options.parseError) {
       let mapped: ApiError | undefined;
       try {
-        const data: unknown = await response.json();
+        const data = await readResponseJson(response, signal);
         mapped = options.parseError?.(response.status, data);
         if (
           data &&
@@ -120,9 +121,11 @@ export async function requestJson<T>(
       .toLowerCase();
     if (!mediaType || !/^application\/(?:json|[\w.-]+\+json)$/.test(mediaType))
       throw new ApiError("invalid_response", response.status);
-    const body: unknown = await response.json();
+    const body = await readResponseJson(response, signal);
     return parse(body);
   } catch {
+    if (response.body && !response.body.locked)
+      void response.body.cancel().catch(() => undefined);
     throw new ApiError(
       signal.aborted ? "timeout" : "invalid_response",
       response.status,

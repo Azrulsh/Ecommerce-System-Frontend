@@ -10,12 +10,12 @@ export default defineConfig({
     {
       name: "unit",
       testMatch:
-        /(?:contracts|api-foundation|auth-cart-unit|checkout-unit|engagement-unit|admin-unit)\.spec\.ts/,
+        /(?:contracts|api-foundation|auth-cart-unit|checkout-unit|engagement-unit|admin-unit|release-unit)\.spec\.ts/,
     },
     {
       name: "e2e",
       testMatch:
-        /(?:storefront|auth-cart|checkout-orders|wishlist-reviews|admin-management)\.spec\.ts/,
+        /(?:storefront|auth-cart|checkout-orders|wishlist-reviews|admin-management|release-quality)\.spec\.ts/,
     },
   ],
   use: {

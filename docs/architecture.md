@@ -1,5 +1,13 @@
 # Phase 1 architecture assessment and foundation
 
+Current release evidence is in the [Phase 6 assessment](phase-6-release-hardening.md)
+and [deployment guide](deployment.md). A document-only Next proxy generates script
+nonces; the root request-time boundary applies them to framework rendering. It is
+not an authorization proxy. Feature/session guards remain unchanged. Transport
+reads now bound decoded JSON bytes and deadlines; encrypted writes cannot replace
+a readable checkpoint with an oversized record. Shared form feedback receives
+keyboard focus. No new infrastructure or dependencies were introduced.
+
 Current administration is documented in the [Phase 5 report](phase-5-admin-dashboard.md).
 It reuses the existing session/BFF boundary, validates a protected Laravel read to
 establish capability, and rechecks it for every privileged operation. Admin pages

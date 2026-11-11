@@ -1,6 +1,12 @@
 # Laravel contract inventory for future frontend phases
 
-Inspected on 9 November 2026. Paths below are relative to `/api`. This is an implementation inventory, not a claim that future modules were implemented or that authenticated workflows were exercised. No backend source, configuration or data was changed.
+Inspected on 9 November 2026, with security-critical authorization and checkout source rechecked on 10 November. Paths below are relative to `/api`. This inventory does not claim live authenticated acceptance. No backend source, configuration or data was changed. Current release evidence is in the [Phase 6 assessment](phase-6-release-hardening.md); features and limitations are detailed in the phase reports.
+
+The frontend transport now bounds decoded JSON to 8 MiB under its existing
+eight-second deadline. Exceeding that bound fails safely rather than truncating a
+resource. This is a BFF reliability limit, not a new Laravel capability or a change
+to the API's business validation. The protected category-read capability probe and
+customer-scoped checkout-idempotency contract remain unchanged.
 
 ## Response and authorization conventions
 

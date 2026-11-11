@@ -1,10 +1,12 @@
 # Everyday storefront
 
-A Next.js storefront for the independent Laravel e-commerce API. Phase 5 adds verified administrator access, sales reporting, product/category management, stock updates, discounts and order management to the accepted customer storefront. The teal design is preserved. Real payment processing and customer/role administration remain outside the supported API.
+A Next.js storefront for the independent Laravel e-commerce API, with customer shopping and verified administrator store management. Phase 6 hardens the accepted features and assesses a **v1.0.0 portfolio/demo release candidate**; no release is published. The teal design is preserved. Real payments and customer/role administration remain outside the supported API.
+
+**Release assessment:** CONDITIONAL GO for restricted local/controlled demonstrations; NO-GO for public deployment and real commercial operations. Private live-Laravel acceptance and target deployment validation remain pending. See the [Phase 6 evidence and limitations](docs/phase-6-release-hardening.md) and [single-host deployment guide](docs/deployment.md).
 
 ## Stack and setup
 
-Next.js 16.4.5 App Router, React 19.3, strict TypeScript, Tailwind CSS 4, locally owned shadcn/ui primitives, Lucide React, native Fetch and Playwright. No dependencies were added for Phases 2–5. Consult the installed Next.js documentation before framework changes.
+Next.js 16.4.5 App Router, React 19.3, strict TypeScript, Tailwind CSS 4, locally owned shadcn/ui primitives, Lucide React, native Fetch and Playwright. No dependencies were added for Phases 2–6. Consult the installed Next.js documentation before framework changes.
 
 Requirements: Node.js 20.9+ (verified with 24.22.2), npm and the separately managed Laravel API. Run commands only in `ecommerce-frontend`:
 
@@ -96,7 +98,9 @@ SESSION_ENCRYPTION_KEY=<random 32-byte base64 secret supplied privately>
 
 Provision the directory and restrictive service-account ACLs before deployment. Do not use a directory beneath this repository or `htdocs`, or a temporary/ephemeral volume. Production fails safely when configuration is missing; there is no memory-store fallback. The encryption key and session directory must survive restarts together. Real remote deployments require HTTPS; explicit loopback HTTP supports local production-build tests only. See the [Phase 2 report](docs/phase-2-auth-cart.md) for operations, recovery and remaining release requirements.
 
-The same private volume now stores critical checkout idempotency/recovery records. Do not delete active attempts, unresolved import records or their encryption key. Losing them removes the frontend's ability to identify a prior logical attempt; recover the protected backup and manually reconcile purchases before accepting another attempt. No new environment variables are required for Phase 3.
+The same private volume stores critical checkout idempotency/recovery records. Do not delete active attempts, unresolved import records or their encryption key. Losing them removes the frontend's ability to identify a prior logical attempt; recover the protected backup and manually reconcile purchases before accepting another attempt. Phase 6 adds no environment variables and enforces the documented absolute production storage path.
+
+Documents now use a fresh script nonce and strict Content Security Policy, with request-time rendering including error pages. Production scripts allow neither unsafe-inline nor eval; styles retain an inline exception for React attributes. HTTPS production documents emit HSTS and insecure-request upgrades. Verify those controls at the real TLS edge; never publicly cache nonce-bearing HTML/RSC. Upstream JSON is bounded to 8 MiB decoded bytes within the eight-second deadline. Encrypted record writes reject unreadable sizes before replacing an existing checkpoint. See deployment guidance for Windows ACLs, quotas, stale locks and recovery.
 
 ## Validation
 
@@ -115,12 +119,14 @@ npm.cmd audit
 
 Tests reserve ports 3100, 8101 and 8102, refuse occupied ports and stop only processes they launch. **All authentication, cart, checkout, payment, order, wishlist, review and admin traffic goes to isolated test-only Node fixtures**, with credentials and keys generated per run. Admin product reads/writes also stop at the fixture. Only public catalog GETs reach the actual Laravel API. Wishlist/review/admin fixtures reuse a validated public catalog snapshot; pagination requires at least 13 existing products. Synthetic admin permissions exist only in fixture memory. No backend users are created/promoted and no database fixtures are created. Local expiry/recovery tests alter only their owned encrypted temporary frontend records. This isolation is essential because even Laravel `GET /cart` can create database records.
 
-The suite has 74 unit/transport checks and 96 browser/BFF integration checks, 170 total. All 125 Phase 1–4 tests remain. Phase 5 adds role/access checks, privileged CRUD and validation, absolute stock changes, reporting, cancellation/refund rollback, uncertainty, stale responses, session/account isolation and responsive admin UI. Authenticated live-Laravel acceptance testing remains a separate task for an explicitly authorized disposable environment.
+The suite now contains 86 unit/transport checks and 102 browser/BFF integration checks, 188 total. All 170 accepted Phase 1–5 tests remain unchanged. Phase 6 adds bounded transport/storage, failure cleanup, CSP enforcement/hydration, keyboard/error focus, privacy and measured browser observations. The [Phase 6 report](docs/phase-6-release-hardening.md) records final results and evidence. Authenticated live-Laravel acceptance remains a separate task for an explicitly authorized disposable environment.
 
 The audit reports zero production vulnerabilities and eight existing moderate findings in the development lint chain. No forced downgrade, audit fix or dependency upgrade was applied.
 
 ## Documentation and next work
 
+- [Phase 6 security findings, P0/P1/P2 assessment, validation, acceptance checklist and release decisions](docs/phase-6-release-hardening.md)
+- [Environment setup, single-host deployment, HTTPS/CSP, storage, logging and recovery](docs/deployment.md)
 - [Phase 5 admin implementation, authorization, contracts, file manifest and manual acceptance](docs/phase-5-admin-dashboard.md)
 - [Phase 4 wishlist/review implementation, verified eligibility, file manifest and manual checks](docs/phase-4-wishlist-reviews.md)
 - [Phase 3 checkout/order implementation, idempotency, contracts, file manifest, validation and manual checks](docs/phase-3-checkout-orders.md)
@@ -130,4 +136,4 @@ The audit reports zero production vulnerabilities and eight existing moderate fi
 - [Historical authentication decision](docs/authentication-strategy.md)
 - [Phase 1 delivery report](docs/phase-1-report.md)
 
-Before release, verify HTTPS cookies, private storage ACLs/durability, proxy rate limits, CSP/HSTS, backup/restore and operational recovery. Cart import remains non-atomic; checkout idempotency relies on Laravel's customer-scoped key and the durable frontend checkpoint. There is no cart revision/quote lock or order lookup by idempotency key. Phase 6 should prioritize disposable-environment acceptance, deployment hardening, admin abuse controls and accessibility/performance validation. Full inactive inventory, stock revisions, customer/role management and real payments require separately approved backend capabilities. No backend changes, commits, pushes, merges or releases are performed by this work.
+Before public deployment, verify HTTPS cookies, private storage ACLs/durability, proxy rate limits, external CSP/HSTS/cache behavior, backup/restore and operational recovery. Complete private disposable-backend acceptance and broader screen-reader/browser checks. Cart import remains non-atomic; checkout idempotency relies on Laravel's customer-scoped key and the durable frontend checkpoint. There is no cart revision/quote lock or order lookup by idempotency key. Full inactive inventory, stock revisions, customer/role management and real payments require separately approved backend capabilities. No backend changes, commits, pushes, merges or releases are performed by this work.

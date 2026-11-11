@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 export interface AdminField {
   name: string;
@@ -31,6 +31,10 @@ export function AdminForm({
   const [busy, setBusy] = useState(false);
   const active = useRef(false);
   const [error, setError] = useState("");
+  const errorSummary = useRef<HTMLParagraphElement>(null);
+  useEffect(() => {
+    if (error) errorSummary.current?.focus();
+  }, [error]);
   return (
     <form
       className="space-y-5 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6"
@@ -147,7 +151,12 @@ export function AdminForm({
         );
       })}
       {error && (
-        <p role="alert" className="text-sm text-rose-800">
+        <p
+          ref={errorSummary}
+          tabIndex={-1}
+          role="alert"
+          className="text-sm text-rose-800"
+        >
           {error}
         </p>
       )}

@@ -16,6 +16,8 @@ function exists(error: unknown) {
   return error instanceof Error && "code" in error && error.code === "EEXIST";
 }
 
+const maxRecordBytes = 256_000;
+
 // Persistent encrypted records and exclusive filesystem locks for one Node host.
 export class FileStore {
   constructor(
@@ -40,8 +42,15 @@ export class FileStore {
     parse: (value: unknown) => T,
   ): Promise<T | null> {
     try {
-      const data = await readFile(this.filename(namespace, id));
-      if (data.length > 256_000 || data[0] !== 1) throw new Error();
+      const handle = await open(this.filename(namespace, id), "r");
+      let data: Buffer;
+      try {
+        if ((await handle.stat()).size > maxRecordBytes) throw new Error();
+        data = await handle.readFile();
+      } finally {
+        await handle.close();
+      }
+      if (data.length > maxRecordBytes || data[0] !== 1) throw new Error();
       const decipher = createDecipheriv(
         "aes-256-gcm",
         this.key,
@@ -68,24 +77,28 @@ export class FileStore {
     }
   }
   async write(namespace: string, id: string, value: unknown) {
+    const plain = JSON.stringify(value);
+    // Do not replace a valid checkpoint with a record that cannot be read.
+    if (
+      plain === undefined ||
+      Buffer.byteLength(plain, "utf8") + 29 > maxRecordBytes
+    )
+      throw new ApiError("unavailable", 503);
     const filename = this.filename(namespace, id);
     const temp = `${filename}.${randomBytes(12).toString("hex")}.tmp`;
     const iv = randomBytes(12);
     const cipher = createCipheriv("aes-256-gcm", this.key, iv);
-    const body = Buffer.concat([
-      cipher.update(JSON.stringify(value), "utf8"),
-      cipher.final(),
-    ]);
-    const handle = await open(temp, "wx", 0o600);
+    const body = Buffer.concat([cipher.update(plain, "utf8"), cipher.final()]);
     try {
-      await handle.writeFile(
-        Buffer.concat([Buffer.from([1]), iv, cipher.getAuthTag(), body]),
-      );
-      await handle.sync();
-    } finally {
-      await handle.close();
-    }
-    try {
+      const handle = await open(temp, "wx", 0o600);
+      try {
+        await handle.writeFile(
+          Buffer.concat([Buffer.from([1]), iv, cipher.getAuthTag(), body]),
+        );
+        await handle.sync();
+      } finally {
+        await handle.close();
+      }
       await rename(temp, filename);
     } catch (error) {
       await unlink(temp).catch(() => undefined);

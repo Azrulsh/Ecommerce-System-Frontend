@@ -1,5 +1,6 @@
 ﻿import type { Metadata } from "next";
 import { Header } from "@/components/layout/Header";
+import { connection } from "next/server";
 import { Footer } from "@/components/layout/Footer";
 import { CommerceProvider } from "@/features/cart/components/CommerceProvider";
 import { CommerceNotice } from "@/features/cart/components/CommerceNotice";
@@ -16,11 +17,13 @@ export const metadata: Metadata = {
     "Discover essentials for your space, your style, and everything in between. Explore the Everyday collection.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // Nonces need request-time rendering, including otherwise static pages.
+  await connection();
   return (
     <html lang="en" className="h-full antialiased">
       <body className="flex min-h-full flex-col">

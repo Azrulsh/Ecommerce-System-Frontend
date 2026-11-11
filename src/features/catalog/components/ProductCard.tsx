@@ -17,7 +17,7 @@ export function ProductCard({ product }: { product: Product }) {
       >
         <div className="relative">
           <ProductPlaceholder />
-          <span className="absolute left-3 top-3 rounded-full border border-white/80 bg-white/95 px-2.5 py-1 text-[11px] font-medium text-slate-600">
+          <span className="absolute left-3 top-3 max-w-[calc(100%_-_1.5rem)] break-words rounded-full border border-white/80 bg-white/95 px-2.5 py-1 text-[11px] font-medium text-slate-600">
             {product.category?.name ?? "Uncategorized"}
           </span>
           {product.stock_quantity === 0 && (
@@ -27,7 +27,7 @@ export function ProductCard({ product }: { product: Product }) {
           )}
         </div>
         <div className="p-5">
-          <h3 className="min-h-12 text-base font-semibold leading-6 tracking-tight transition-colors group-hover:text-teal-700">
+          <h3 className="min-h-12 break-words text-base font-semibold leading-6 tracking-tight transition-colors group-hover:text-teal-700">
             {product.name}
           </h3>
           <p className="mt-2 line-clamp-2 min-h-10 text-sm leading-5 text-slate-500">

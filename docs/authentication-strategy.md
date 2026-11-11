@@ -1,5 +1,11 @@
 # Sanctum integration decision for a future phase
 
+Current hardening and residual risks are in the [Phase 6 assessment](phase-6-release-hardening.md).
+The accepted bearer-only BFF strategy remains. Nonce CSP supplements text rendering
+and CSRF checks; it does not authorize users. Absolute production storage paths,
+bounded encrypted records and failure cleanup reinforce the existing store, without
+claiming validated NTFS ACLs or a deployed TLS edge. See [operations](deployment.md).
+
 Phase 5 now establishes admin capability through the protected category-read probe
 described in the [admin report](phase-5-admin-dashboard.md). It does not invent a
 role field or change authentication. The omitted-role concern below remains a

@@ -70,6 +70,10 @@
   .field-label {
     @apply mb-2 block text-xs font-semibold text-slate-600;
   }
+  textarea.field {
+    height: auto;
+    min-height: 7rem;
+  }
   .hero {
     background:
       radial-gradient(ellipse at 80% 15%, #168f81 0%, transparent 55%),
